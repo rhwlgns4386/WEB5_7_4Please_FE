@@ -10,8 +10,30 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search } from 'lucide-react';
+import { useState } from 'react';
+import { useRouter } from '@tanstack/react-router';
 
 export default function Hero() {
+  const router = useRouter();
+  const [category, setCategory] = useState('all');
+  const [query, setQuery] = useState('');
+
+  const handleSearch = () => {
+    const params = new URLSearchParams();
+
+    if (category && category !== 'all') {
+      params.set('category', category);
+    }
+    if (query.trim()) {
+      params.set('query', query.trim());
+    }
+
+    const searchString = params.toString();
+    const url = `/products/${searchString ? '?' + searchString : ''}`;
+
+    router.navigate({ to: url });
+  };
+
   return (
     <section className='bg-gradient-to-r from-gray-800 to-gray-900 py-16 relative overflow-hidden'>
       <div className='absolute inset-0 bg-gradient-to-r from-gray-800/10 to-orange-400/10'></div>
@@ -29,7 +51,7 @@ export default function Hero() {
           </p>
           <div className='max-w-3xl mx-auto animate-fade-in-delay-2'>
             <div className='flex flex-col sm:flex-row gap-4 items-center'>
-              <Select defaultValue='all'>
+              <Select value={category} onValueChange={setCategory}>
                 <SelectTrigger className='w-[180px]'>
                   <SelectValue placeholder='카테고리 선택' />
                 </SelectTrigger>
@@ -49,11 +71,15 @@ export default function Hero() {
               <div className='flex-1 relative'>
                 <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5' />
                 <Input
+                  value={query}
+                  onChange={e => setQuery(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && handleSearch()}
                   placeholder='찾고 있는 상품을 검색해보세요...'
                   className='pl-10 h-12 bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-orange-500 transition-all duration-300 hover:bg-gray-750'
                 />
               </div>
               <Button
+                onClick={handleSearch}
                 size='lg'
                 className='bg-orange-600 hover:bg-orange-700 h-12 px-8 text-white transition-all duration-300 hover:scale-105 hover:shadow-lg'
               >
