@@ -3,7 +3,7 @@ import Logo from "@/assets/logo.svg?react";
 
 export default function Header() {
   return (
-    <div className="w-full flex justify-between items-center py-4 px-8 border-b border-gray-200">
+    <div className="w-full flex justify-between items-center py-4 px-8 border-b border-gray-200 fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-950">
         <div className="flex items-center gap-2">
             <Logo />
         <span className="text-2xl font-bold">Deal4U</span>
