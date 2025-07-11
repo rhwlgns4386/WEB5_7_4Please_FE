@@ -53,7 +53,6 @@ function Products() {
   const router = useRouter();
   const [currentSearch, setCurrentSearch] = useState<ProductsSearch>({});
 
-  // URL에서 search params 읽기
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     setCurrentSearch({
@@ -64,14 +63,12 @@ function Products() {
     });
   }, []);
 
-  // 로컬 상태 (폼 입력용)
   const [localCategory, setLocalCategory] = useState(
     currentSearch.category || 'all'
   );
   const [localQuery, setLocalQuery] = useState(currentSearch.query || '');
   const [localSort, setLocalSort] = useState(currentSearch.sort || 'latest');
 
-  // URL 업데이트 함수
   const updateURL = (newSearch: Partial<ProductsSearch>) => {
     const updatedSearch = { ...currentSearch, ...newSearch };
     if (
@@ -79,7 +76,7 @@ function Products() {
       newSearch.query !== undefined ||
       newSearch.sort !== undefined
     ) {
-      updatedSearch.page = 1; // 새 검색시 page 1로 리셋
+      updatedSearch.page = 1;
     }
 
     const params = new URLSearchParams();
@@ -248,7 +245,13 @@ function Products() {
           <>
             <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8'>
               {paginatedProducts.map(product => (
-                <ProductCard key={product.id} product={product} theme='dark' />
+                <Link
+                  to={`/products/$id`}
+                  params={{ id: product.id.toString() }}
+                  key={product.id}
+                >
+                  <ProductCard product={product} theme='dark' />
+                </Link>
               ))}
             </div>
 

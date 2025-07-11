@@ -10,13 +10,39 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from '@tanstack/react-router';
+import { motion } from 'framer-motion';
 
 export default function Hero() {
   const router = useRouter();
   const [category, setCategory] = useState('all');
   const [query, setQuery] = useState('');
+
+  const [titleNumber, setTitleNumber] = useState(0);
+  const titles = useMemo(
+    () => [
+      '가전제품',
+      '패션',
+      '전자제품',
+      '스포츠',
+      '가구',
+      '생활용품',
+      '기타',
+    ],
+    []
+  );
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (titleNumber === titles.length - 1) {
+        setTitleNumber(0);
+      } else {
+        setTitleNumber(titleNumber + 1);
+      }
+    }, 2000);
+    return () => clearTimeout(timeoutId);
+  }, [titleNumber, titles]);
 
   const handleSearch = () => {
     const params = new URLSearchParams();
@@ -42,13 +68,40 @@ export default function Hero() {
           <h1 className='text-5xl md:text-7xl font-bold mb-6 text-white animate-fade-in'>
             Deal4U
           </h1>
-          <p className='text-xl md:text-2xl mb-8 text-gray-300 animate-fade-in-delay'>
-            <span className='text-orange-400 font-bold'>
-              사는 놈이 가격을 정한다!
-            </span>
-            <br />
-            입찰로 만나는 공정한 중고거래, Deal4U에서 시작하세요
-          </p>
+          <div className='flex gap-4 flex-col items-center'>
+            <h1 className='text-5xl md:text-7xl max-w-2xl tracking-tighter text-center font-regular flex flex-col gap-8'>
+              <span className='text-orange-400'>당신이 찾던 중고경매</span>
+              <span className='relative flex w-full justify-center overflow-hidden text-center md:pb-4 md:pt-1'>
+                &nbsp;
+                {titles.map((title, index) => (
+                  <motion.span
+                    key={index}
+                    className='absolute font-semibold'
+                    initial={{ opacity: 0, y: '-100' }}
+                    transition={{ type: 'spring', stiffness: 50 }}
+                    animate={
+                      titleNumber === index
+                        ? {
+                            y: 0,
+                            opacity: 1,
+                          }
+                        : {
+                            y: titleNumber > index ? -150 : 150,
+                            opacity: 0,
+                          }
+                    }
+                  >
+                    {title}
+                  </motion.span>
+                ))}
+              </span>
+            </h1>
+
+            <p className='text-lg md:text-xl leading-relaxed tracking-tight text-muted-foreground max-w-2xl text-center mb-10'>
+              입찰로 만나는 공정한 중고거래, Deal4U에서 시작하세요
+            </p>
+          </div>
+
           <div className='max-w-3xl mx-auto animate-fade-in-delay-2'>
             <div className='flex flex-col sm:flex-row gap-4 items-center'>
               <Select value={category} onValueChange={setCategory}>
