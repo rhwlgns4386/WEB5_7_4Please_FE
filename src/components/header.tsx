@@ -15,7 +15,9 @@ export default function Header() {
       </Link>
       <div>
         <Button variant='outline'>
-          <span>로그인</span>
+          <Link to='/login'>
+            <span>로그인</span>
+          </Link>
         </Button>
       </div>
     </div>
