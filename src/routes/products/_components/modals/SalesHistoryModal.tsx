@@ -20,7 +20,7 @@ export default function SalesHistoryModal({ isOpen, onClose }: Props) {
           <DialogTitle>김판매님의 판매 내역</DialogTitle>
           <DialogDescription>4건</DialogDescription>
         </DialogHeader>
-        {Array.from({ length: 6 }).map((_, index) => (
+        {Array.from({ length: 6 }).map((_, _index) => (
           <div className='border border-gray-500 rounded-lg p-4 flex flex-row gap-4'>
             <div className='w-[100px] h-[100px] rounded-lg overflow-hidden flex-shrink-0'>
               <img

@@ -21,7 +21,7 @@ type Status =
 export default function BiddingForm() {
   const [isBiddingPriceConfirmModalOpen, setIsBiddingPriceConfirmModalOpen] =
     useState(false);
-  const [status, setStatus] = useState<Status>('biddingEnded');
+  const [status, _setStatus] = useState<Status>('biddingEnded');
 
   const contentsMapping = {
     hasImmediatePaymentSeller: () => {
