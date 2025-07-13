@@ -1,3 +1,4 @@
+import BiddingCancelConfirmModal from '@/components/bidding-cancel-confirm-modal';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,7 +22,9 @@ type Status =
 export default function BiddingForm() {
   const [isBiddingPriceConfirmModalOpen, setIsBiddingPriceConfirmModalOpen] =
     useState(false);
-  const [status, _setStatus] = useState<Status>('biddingEnded');
+  const [status, _setStatus] = useState<Status>(
+    'withoutImmediatePaymentSeller'
+  );
 
   const contentsMapping = {
     hasImmediatePaymentSeller: () => {
@@ -40,9 +43,7 @@ export default function BiddingForm() {
               1200000원
             </span>
           </div>
-          <Button variant={'destructive'}>
-            <LucideHammer /> 경매 취소
-          </Button>
+          <BiddingCancelConfirmModal />
         </div>
       );
     },
@@ -87,9 +88,7 @@ export default function BiddingForm() {
               시작가:500,000원 | 입찰25회
             </span>
           </div>
-          <Button variant={'destructive'}>
-            <LucideHammer /> 경매 취소
-          </Button>
+          <BiddingCancelConfirmModal />
         </div>
       );
     },

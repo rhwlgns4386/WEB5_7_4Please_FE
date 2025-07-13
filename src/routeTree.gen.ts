@@ -10,7 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as RegisterProductIndexRouteImport } from './routes/registerProduct/index'
 import { Route as ProductsIndexRouteImport } from './routes/products/index'
+import { Route as MypageIndexRouteImport } from './routes/mypage/index'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as indexIndexRouteImport } from './routes/(index)/index'
 import { Route as ProductsIdRouteImport } from './routes/products/$id'
@@ -20,9 +22,19 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RegisterProductIndexRoute = RegisterProductIndexRouteImport.update({
+  id: '/registerProduct/',
+  path: '/registerProduct/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProductsIndexRoute = ProductsIndexRouteImport.update({
   id: '/products/',
   path: '/products/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MypageIndexRoute = MypageIndexRouteImport.update({
+  id: '/mypage/',
+  path: '/mypage/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginIndexRoute = LoginIndexRouteImport.update({
@@ -46,13 +58,17 @@ export interface FileRoutesByFullPath {
   '/products/$id': typeof ProductsIdRoute
   '/': typeof indexIndexRoute
   '/login/': typeof LoginIndexRoute
+  '/mypage': typeof MypageIndexRoute
   '/products': typeof ProductsIndexRoute
+  '/registerProduct': typeof RegisterProductIndexRoute
 }
 export interface FileRoutesByTo {
   '/products/$id': typeof ProductsIdRoute
   '/': typeof indexIndexRoute
   '/login': typeof LoginIndexRoute
+  '/mypage': typeof MypageIndexRoute
   '/products': typeof ProductsIndexRoute
+  '/registerProduct': typeof RegisterProductIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -60,27 +76,46 @@ export interface FileRoutesById {
   '/products/$id': typeof ProductsIdRoute
   '/(index)/': typeof indexIndexRoute
   '/login/': typeof LoginIndexRoute
+  '/mypage/': typeof MypageIndexRoute
   '/products/': typeof ProductsIndexRoute
+  '/registerProduct/': typeof RegisterProductIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/login' | '/products/$id' | '/' | '/login/' | '/products'
+  fullPaths:
+    | '/login'
+    | '/products/$id'
+    | '/'
+    | '/login/'
+    | '/mypage'
+    | '/products'
+    | '/registerProduct'
   fileRoutesByTo: FileRoutesByTo
-  to: '/products/$id' | '/' | '/login' | '/products'
+  to:
+    | '/products/$id'
+    | '/'
+    | '/login'
+    | '/mypage'
+    | '/products'
+    | '/registerProduct'
   id:
     | '__root__'
     | '/login'
     | '/products/$id'
     | '/(index)/'
     | '/login/'
+    | '/mypage/'
     | '/products/'
+    | '/registerProduct/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   LoginRoute: typeof LoginRouteWithChildren
   ProductsIdRoute: typeof ProductsIdRoute
   indexIndexRoute: typeof indexIndexRoute
+  MypageIndexRoute: typeof MypageIndexRoute
   ProductsIndexRoute: typeof ProductsIndexRoute
+  RegisterProductIndexRoute: typeof RegisterProductIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -92,11 +127,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/registerProduct/': {
+      id: '/registerProduct/'
+      path: '/registerProduct'
+      fullPath: '/registerProduct'
+      preLoaderRoute: typeof RegisterProductIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/products/': {
       id: '/products/'
       path: '/products'
       fullPath: '/products'
       preLoaderRoute: typeof ProductsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mypage/': {
+      id: '/mypage/'
+      path: '/mypage'
+      fullPath: '/mypage'
+      preLoaderRoute: typeof MypageIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login/': {
@@ -137,7 +186,9 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRouteWithChildren,
   ProductsIdRoute: ProductsIdRoute,
   indexIndexRoute: indexIndexRoute,
+  MypageIndexRoute: MypageIndexRoute,
   ProductsIndexRoute: ProductsIndexRoute,
+  RegisterProductIndexRoute: RegisterProductIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
