@@ -1,7 +1,7 @@
 import CommonSelect from '@/components/common-select';
 import { Badge } from '@/components/ui/badge';
 import MyFavoriteCard from '@/routes/mypage/_components/myFavorite/MyFavoriteCard';
-import { LucideHeart, LucideLayoutList } from 'lucide-react';
+import { LucideHeart } from 'lucide-react';
 
 export default function MyFavoriteTab() {
   const sortOptions = [
