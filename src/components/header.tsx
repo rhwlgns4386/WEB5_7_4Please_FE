@@ -1,8 +1,13 @@
 import { Button } from '@/components/ui/button';
 import Logo from '@/assets/logo.svg?react';
-import { Link } from '@tanstack/react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
 
 export default function Header() {
+  const navigate = useNavigate();
+
+  const goToRegisterProduct = () => {
+    navigate({ to: '/registerProduct' });
+  };
   return (
     <div className='w-full flex justify-between items-center py-4 px-8 border-b border-gray-200 fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-950'>
       <Link to='/'>
@@ -21,7 +26,9 @@ export default function Header() {
         </Button>
       </div> */}
       <div className='flex items-center gap-2'>
-        <Button variant={'outline'}>판매하기</Button>
+        <Button variant={'outline'} onClick={goToRegisterProduct}>
+          판매하기
+        </Button>
         <Button variant={'outline'}>마이페이지</Button>
         <span className='text-md text-white underline underline-offset-4'>
           김진우님

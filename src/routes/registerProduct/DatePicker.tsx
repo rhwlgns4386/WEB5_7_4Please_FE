@@ -9,9 +9,24 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 
-export function DatePicker() {
+interface DatePickerProps {
+  value?: string;
+  onChange?: (value: string) => void;
+}
+
+export function DatePicker({ value, onChange }: DatePickerProps) {
   const [open, setOpen] = React.useState(false);
-  const [date, setDate] = React.useState<Date | undefined>(undefined);
+
+  // value prop에서 Date 객체로 변환
+  const selectedDate = value ? new Date(value) : undefined;
+
+  const handleDateSelect = (date: Date | undefined) => {
+    if (date && onChange) {
+      // ISO 날짜 문자열로 변환하여 전달
+      onChange(date.toISOString().split('T')[0]);
+    }
+    setOpen(false);
+  };
 
   return (
     <div className='flex flex-col gap-3 mb-4'>
@@ -22,20 +37,19 @@ export function DatePicker() {
             id='date'
             className='w-48 justify-between font-normal'
           >
-            {date ? date.toLocaleDateString() : '시작일을 선택해주세요'}
+            {selectedDate
+              ? selectedDate.toLocaleDateString()
+              : '시작일을 선택해주세요'}
             <ChevronDownIcon />
           </Button>
         </PopoverTrigger>
         <PopoverContent className='w-auto overflow-hidden p-0' align='start'>
           <Calendar
             mode='single'
-            selected={date}
-            captionLayout='dropdown'
-            onSelect={date => {
-              setDate(date);
-              setOpen(false);
-            }}
-            disabled={d => d < new Date(new Date().setHours(0, 0, 0, 0))}
+            selected={selectedDate}
+            onSelect={handleDateSelect}
+            className='rounded-md border shadow'
+            disabled={date => date <= new Date()}
           />
         </PopoverContent>
       </Popover>
