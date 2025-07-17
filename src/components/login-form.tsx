@@ -1,9 +1,6 @@
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import Logo from '@/assets/logo.svg?react';
-import NaverLogo from '@/assets/naverLogo.svg?react';
-import KakaoLogo from '@/assets/kakaoLogo.svg?react';
-import GoogleLogo from '@/assets/googleIcon.svg?react';
 import {
   Card,
   CardContent,
@@ -11,6 +8,9 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import GoogleLogo from '@/assets/googleIcon.svg?react';
+import NaverLogo from '@/assets/naverLogo.svg?react';
+import KakaoLogo from '@/assets/kakaoLogo.svg?react';
 
 export function LoginForm({
   className,
@@ -18,7 +18,7 @@ export function LoginForm({
 }: React.ComponentProps<'div'>) {
   return (
     <div
-      className={cn('flex flex-col gap-6 min-w-[500px] p-8', className)}
+      className={cn('flex flex-col gap-6 min-w-[600px] p-8', className)}
       {...props}
     >
       <Card>
@@ -36,15 +36,15 @@ export function LoginForm({
           <form>
             <div className='grid gap-6'>
               <div className='flex flex-col gap-4'>
-                <Button variant='outline' className='w-full'>
+                <Button variant='outline' className='w-full h-12'>
                   <GoogleLogo />
                   구글로 로그인
                 </Button>
-                <Button variant='outline' className='w-full'>
+                <Button variant='outline' className='w-full h-12'>
                   <KakaoLogo />
                   카카오로 로그인
                 </Button>
-                <Button variant='outline' className='w-full'>
+                <Button variant='outline' className='w-full h-12'>
                   <NaverLogo />
                   네이버로 로그인
                 </Button>

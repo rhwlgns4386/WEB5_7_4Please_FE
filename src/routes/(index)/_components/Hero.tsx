@@ -61,7 +61,7 @@ export default function Hero() {
   };
 
   return (
-    <section className='bg-gradient-to-r from-gray-800 to-gray-900 py-16 relative overflow-hidden'>
+    <section className='bg-gradient-to-r from-gray-900 to-gray-900 py-16 relative overflow-hidden'>
       <div className='absolute inset-0 bg-gradient-to-r from-gray-800/10 to-orange-400/10'></div>
       <div className='container mx-auto px-4 relative'>
         <div className='max-w-4xl mx-auto text-center'>

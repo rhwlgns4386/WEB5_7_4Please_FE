@@ -10,16 +10,23 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as SignupIndexRouteImport } from './routes/signup/index'
 import { Route as RegisterProductIndexRouteImport } from './routes/registerProduct/index'
 import { Route as ProductsIndexRouteImport } from './routes/products/index'
 import { Route as MypageIndexRouteImport } from './routes/mypage/index'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as indexIndexRouteImport } from './routes/(index)/index'
 import { Route as ProductsIdRouteImport } from './routes/products/$id'
+import { Route as AuthGoogleIndexRouteImport } from './routes/auth/google/index'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupIndexRoute = SignupIndexRouteImport.update({
+  id: '/signup/',
+  path: '/signup/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RegisterProductIndexRoute = RegisterProductIndexRouteImport.update({
@@ -52,6 +59,11 @@ const ProductsIdRoute = ProductsIdRouteImport.update({
   path: '/products/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthGoogleIndexRoute = AuthGoogleIndexRouteImport.update({
+  id: '/auth/google/',
+  path: '/auth/google/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/login': typeof LoginRouteWithChildren
@@ -61,6 +73,8 @@ export interface FileRoutesByFullPath {
   '/mypage': typeof MypageIndexRoute
   '/products': typeof ProductsIndexRoute
   '/registerProduct': typeof RegisterProductIndexRoute
+  '/signup': typeof SignupIndexRoute
+  '/auth/google': typeof AuthGoogleIndexRoute
 }
 export interface FileRoutesByTo {
   '/products/$id': typeof ProductsIdRoute
@@ -69,6 +83,8 @@ export interface FileRoutesByTo {
   '/mypage': typeof MypageIndexRoute
   '/products': typeof ProductsIndexRoute
   '/registerProduct': typeof RegisterProductIndexRoute
+  '/signup': typeof SignupIndexRoute
+  '/auth/google': typeof AuthGoogleIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -79,6 +95,8 @@ export interface FileRoutesById {
   '/mypage/': typeof MypageIndexRoute
   '/products/': typeof ProductsIndexRoute
   '/registerProduct/': typeof RegisterProductIndexRoute
+  '/signup/': typeof SignupIndexRoute
+  '/auth/google/': typeof AuthGoogleIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -90,6 +108,8 @@ export interface FileRouteTypes {
     | '/mypage'
     | '/products'
     | '/registerProduct'
+    | '/signup'
+    | '/auth/google'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/products/$id'
@@ -98,6 +118,8 @@ export interface FileRouteTypes {
     | '/mypage'
     | '/products'
     | '/registerProduct'
+    | '/signup'
+    | '/auth/google'
   id:
     | '__root__'
     | '/login'
@@ -107,6 +129,8 @@ export interface FileRouteTypes {
     | '/mypage/'
     | '/products/'
     | '/registerProduct/'
+    | '/signup/'
+    | '/auth/google/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -116,6 +140,8 @@ export interface RootRouteChildren {
   MypageIndexRoute: typeof MypageIndexRoute
   ProductsIndexRoute: typeof ProductsIndexRoute
   RegisterProductIndexRoute: typeof RegisterProductIndexRoute
+  SignupIndexRoute: typeof SignupIndexRoute
+  AuthGoogleIndexRoute: typeof AuthGoogleIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -125,6 +151,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup/': {
+      id: '/signup/'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/registerProduct/': {
@@ -169,6 +202,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth/google/': {
+      id: '/auth/google/'
+      path: '/auth/google'
+      fullPath: '/auth/google'
+      preLoaderRoute: typeof AuthGoogleIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -189,6 +229,8 @@ const rootRouteChildren: RootRouteChildren = {
   MypageIndexRoute: MypageIndexRoute,
   ProductsIndexRoute: ProductsIndexRoute,
   RegisterProductIndexRoute: RegisterProductIndexRoute,
+  SignupIndexRoute: SignupIndexRoute,
+  AuthGoogleIndexRoute: AuthGoogleIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
