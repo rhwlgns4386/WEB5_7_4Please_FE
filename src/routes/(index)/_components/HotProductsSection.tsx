@@ -9,11 +9,20 @@ import {
 import { popularProducts } from '@/routes/(index)/_constants/products';
 import { LucideChevronRight } from 'lucide-react';
 import ProductCard from './ProductCard';
+import { useNavigate } from '@tanstack/react-router';
 
 export default function HotProductsSection() {
+  const navigate = useNavigate();
   const handleHeartClick = (productId: number) => {
     // 여기에 관심상품 토글 로직 추가
     console.log('관심상품 토글:', productId);
+  };
+
+  const seeAllProducts = () => {
+    navigate({
+      to: '/products',
+      search: { sort: 'bids', category: 'all', query: '', page: 1 },
+    });
   };
 
   return (
@@ -25,6 +34,7 @@ export default function HotProductsSection() {
             <Button
               variant='ghost'
               className='cursor-pointer text-white hover:text-gray-300'
+              onClick={seeAllProducts}
             >
               전체보기 <LucideChevronRight />
             </Button>
@@ -52,8 +62,8 @@ export default function HotProductsSection() {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className='hidden sm:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 border-gray-600 text-white hover:bg-gray-700' />
-            <CarouselNext className='hidden sm:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 border-gray-600 text-white hover:bg-gray-700' />
+            <CarouselPrevious className='hidden sm:flex absolute -left-10 top-1/2 -translate-y-1/2 z-10 border-gray-600 text-white hover:bg-gray-700' />
+            <CarouselNext className='hidden sm:flex absolute -right-10 top-1/2 -translate-y-1/2 z-10 border-gray-600 text-white hover:bg-gray-700' />
           </Carousel>
         </div>
       </div>

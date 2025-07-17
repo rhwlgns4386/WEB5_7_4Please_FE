@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useRouter } from '@tanstack/react-router';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   Select,
   SelectContent,
@@ -20,19 +20,20 @@ import {
   PaginationItem,
 } from '@/components/ui/pagination';
 
-// Search 파라미터 타입 정의
+type SortType = 'latest' | 'bids' | 'timeout';
+
 type ProductsSearch = {
-  category?: string;
-  query?: string;
-  sort?: 'latest' | 'popular';
-  page?: number;
+  category: string;
+  query: string;
+  sort: SortType;
+  page: number;
 };
 
 export const Route = createFileRoute('/products/')({
   validateSearch: (search: Record<string, unknown>): ProductsSearch => ({
     category: (search.category as string) || 'all',
     query: (search.query as string) || '',
-    sort: (search.sort as 'latest' | 'popular') || 'latest',
+    sort: (search.sort as SortType) || 'latest',
     page: Number(search.page) || 1,
   }),
   component: Products,
@@ -51,54 +52,30 @@ const categoryMap = {
 
 function Products() {
   const router = useRouter();
-  const [currentSearch, setCurrentSearch] = useState<ProductsSearch>({});
+  const searchParams = Route.useSearch();
 
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    setCurrentSearch({
-      category: urlParams.get('category') || 'all',
-      query: urlParams.get('query') || '',
-      sort: (urlParams.get('sort') as 'latest' | 'popular') || 'latest',
-      page: Number(urlParams.get('page')) || 1,
-    });
-  }, []);
+  // 필터 UI의 입력 상태를 관리하기 위한 로컬 상태
+  const [localCategory, setLocalCategory] = useState(searchParams.category);
+  const [localQuery, setLocalQuery] = useState(searchParams.query);
+  const [localSort, setLocalSort] = useState<SortType>(searchParams.sort);
 
-  const [localCategory, setLocalCategory] = useState(
-    currentSearch.category || 'all'
-  );
-  const [localQuery, setLocalQuery] = useState(currentSearch.query || '');
-  const [localSort, setLocalSort] = useState(currentSearch.sort || 'latest');
-
+  // URL을 업데이트하는 중앙 함수
   const updateURL = (newSearch: Partial<ProductsSearch>) => {
-    const updatedSearch = { ...currentSearch, ...newSearch };
-    if (
+    // 검색 조건이 변경되면 항상 1페이지로 리셋
+    const shouldResetPage =
       newSearch.category !== undefined ||
       newSearch.query !== undefined ||
-      newSearch.sort !== undefined
-    ) {
-      updatedSearch.page = 1;
-    }
+      newSearch.sort !== undefined;
 
-    const params = new URLSearchParams();
-    if (updatedSearch.category && updatedSearch.category !== 'all') {
-      params.set('category', updatedSearch.category);
-    }
-    if (updatedSearch.query) {
-      params.set('query', updatedSearch.query);
-    }
-    if (updatedSearch.sort && updatedSearch.sort !== 'latest') {
-      params.set('sort', updatedSearch.sort);
-    }
-    if (updatedSearch.page && updatedSearch.page > 1) {
-      params.set('page', updatedSearch.page.toString());
-    }
+    const updatedSearch = {
+      ...searchParams,
+      ...newSearch,
+      page: shouldResetPage ? 1 : newSearch.page || searchParams.page,
+    };
 
-    const newURL = `/products/${params.toString() ? '?' + params.toString() : ''}`;
-    router.navigate({ to: newURL });
-    setCurrentSearch(updatedSearch);
+    router.navigate({ to: '/products', search: updatedSearch });
   };
 
-  // 검색 실행
   const handleSearch = () => {
     updateURL({
       category: localCategory,
@@ -107,47 +84,38 @@ function Products() {
     });
   };
 
-  // 페이지 변경
-  const handlePageChange = (page: number) => {
-    updateURL({ page });
-  };
-
   // 상품 필터링 및 정렬 로직 (임시 데이터 사용)
   const filteredProducts = popularProducts.filter(product => {
-    const category = currentSearch.category || 'all';
-    const query = currentSearch.query || '';
-
     const categoryMatch =
-      category === 'all' ||
-      (category === 'electronics' && product.tag === '전자제품') ||
-      (category === 'fashion' && product.tag === '패션') ||
-      (category === 'sports' && product.tag === '스포츠') ||
-      (category === 'furniture' && product.tag === '가구') ||
-      (category === 'household' && product.tag === '생활용품');
+      searchParams.category === 'all' ||
+      (searchParams.category === 'electronics' && product.tag === '전자제품') ||
+      (searchParams.category === 'fashion' && product.tag === '패션') ||
+      (searchParams.category === 'sports' && product.tag === '스포츠') ||
+      (searchParams.category === 'furniture' && product.tag === '가구') ||
+      (searchParams.category === 'household' && product.tag === '생활용품');
 
     const queryMatch =
-      !query || product.title.toLowerCase().includes(query.toLowerCase());
+      !searchParams.query ||
+      product.title.toLowerCase().includes(searchParams.query.toLowerCase());
 
     return categoryMatch && queryMatch;
   });
 
   // 정렬 적용
   const sortedProducts = [...filteredProducts].sort((a, b) => {
-    const sort = currentSearch.sort || 'latest';
-    if (sort === 'popular') {
+    if (searchParams.sort === 'bids') {
       return b.bidCount - a.bidCount;
     }
+    // 'timeout' 정렬 로직 추가 필요 (현재는 latest와 동일)
     return a.id - b.id; // latest (기본값)
   });
 
   // 페이지네이션
   const itemsPerPage = 20;
   const totalPages = Math.ceil(sortedProducts.length / itemsPerPage);
-  const currentPage = currentSearch.page || 1;
-  const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedProducts = sortedProducts.slice(
-    startIndex,
-    startIndex + itemsPerPage
+    (searchParams.page - 1) * itemsPerPage,
+    searchParams.page * itemsPerPage
   );
 
   return (
@@ -156,15 +124,11 @@ function Products() {
       <div className='bg-white dark:bg-gray-800 border-b dark:border-gray-700'>
         <div className='container mx-auto px-4 py-6'>
           <h1 className='text-3xl font-bold text-gray-900 dark:text-white'>
-            {
-              categoryMap[
-                (currentSearch.category || 'all') as keyof typeof categoryMap
-              ]
-            }{' '}
+            {categoryMap[searchParams.category as keyof typeof categoryMap]}{' '}
             상품
-            {currentSearch.query && (
+            {searchParams.query && (
               <span className='text-orange-500 ml-2'>
-                '{currentSearch.query}'
+                '{searchParams.query}'
               </span>
             )}
           </h1>
@@ -200,9 +164,7 @@ function Products() {
             {/* 정렬 필터 */}
             <Select
               value={localSort}
-              onValueChange={(value: 'latest' | 'popular') =>
-                setLocalSort(value)
-              }
+              onValueChange={(value: string) => setLocalSort(value as SortType)}
             >
               <SelectTrigger className='w-[150px]'>
                 <SelectValue placeholder='정렬 방식' />
@@ -211,7 +173,8 @@ function Products() {
                 <SelectGroup>
                   <SelectLabel>정렬</SelectLabel>
                   <SelectItem value='latest'>최신순</SelectItem>
-                  <SelectItem value='popular'>인기순</SelectItem>
+                  <SelectItem value='bids'>인기순</SelectItem>
+                  <SelectItem value='timeout'>마감임박순</SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>
@@ -263,14 +226,15 @@ function Products() {
                     <PaginationItem>
                       <button
                         onClick={() =>
-                          currentPage > 1 && handlePageChange(currentPage - 1)
+                          searchParams.page > 1 &&
+                          updateURL({ page: searchParams.page - 1 })
                         }
                         className={`inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 gap-1 pl-2.5 ${
-                          currentPage <= 1
+                          searchParams.page <= 1
                             ? 'pointer-events-none opacity-50'
                             : 'cursor-pointer'
                         }`}
-                        disabled={currentPage <= 1}
+                        disabled={searchParams.page <= 1}
                       >
                         이전
                       </button>
@@ -279,9 +243,9 @@ function Products() {
                     {[...Array(totalPages)].map((_, i) => (
                       <PaginationItem key={i + 1}>
                         <button
-                          onClick={() => handlePageChange(i + 1)}
+                          onClick={() => updateURL({ page: i + 1 })}
                           className={`inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-10 cursor-pointer ${
-                            currentPage === i + 1
+                            searchParams.page === i + 1
                               ? 'bg-primary text-primary-foreground hover:bg-primary/90'
                               : ''
                           }`}
@@ -294,15 +258,15 @@ function Products() {
                     <PaginationItem>
                       <button
                         onClick={() =>
-                          currentPage < totalPages &&
-                          handlePageChange(currentPage + 1)
+                          searchParams.page < totalPages &&
+                          updateURL({ page: searchParams.page + 1 })
                         }
                         className={`inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 gap-1 pr-2.5 ${
-                          currentPage >= totalPages
+                          searchParams.page >= totalPages
                             ? 'pointer-events-none opacity-50'
                             : 'cursor-pointer'
                         }`}
-                        disabled={currentPage >= totalPages}
+                        disabled={searchParams.page >= totalPages}
                       >
                         다음
                       </button>

@@ -13,12 +13,19 @@ export default function Header() {
           <span className='text-md text-gray-500'>당신을 위한 거래</span>
         </div>
       </Link>
-      <div>
+      {/* <div>
         <Button variant='outline'>
           <Link to='/login'>
             <span>로그인</span>
           </Link>
         </Button>
+      </div> */}
+      <div className='flex items-center gap-2'>
+        <Button variant={'outline'}>판매하기</Button>
+        <Button variant={'outline'}>마이페이지</Button>
+        <span className='text-md text-white underline underline-offset-4'>
+          김진우님
+        </span>
       </div>
     </div>
   );
