@@ -24,6 +24,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import useCreateAuction from '@/routes/registerProduct/hooks/useCreateAuction';
 
 export const Route = createFileRoute('/registerProduct/')({
   component: RegisterProductPage,
@@ -45,6 +46,8 @@ export default function RegisterProductPage() {
     form,
     handleFormSubmit,
   } = useImageUpload();
+
+  const { postAuction } = useCreateAuction();
 
   return (
     <div className='relative'>

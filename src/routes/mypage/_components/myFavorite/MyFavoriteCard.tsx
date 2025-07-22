@@ -1,6 +1,14 @@
 import { Button } from '@/components/ui/button';
+import { LucideHeart } from 'lucide-react';
+import { useState } from 'react';
 
 export default function MyFavoriteCard() {
+  const [isFavorite, setIsFavorite] = useState(false);
+
+  const handleFavorite = () => {
+    setIsFavorite(!isFavorite);
+  };
+
   return (
     <div className='relative bg-gradient-to-br from-gray-800/80 to-gray-700/60 rounded-2xl px-6 py-5 flex gap-6 items-center w-full shadow-lg border border-gray-700 hover:shadow-2xl transition-shadow duration-200'>
       <div className='w-[100px] h-[100px] rounded-xl overflow-hidden shrink-0 border-2 border-gray-600 shadow-md'>
@@ -15,7 +23,15 @@ export default function MyFavoriteCard() {
           <span className='font-semibold text-lg text-white truncate max-w-[160px]'>
             아이폰 16 프로 맥스
           </span>
-          <Button className='bg-red-500 hover:bg-red-600 text-white px-4 py-1 rounded-lg text-sm shadow-sm transition-colors duration-150'>
+          <Button
+            onClick={handleFavorite}
+            variant={'outline'}
+            className='text-white px-4 py-1 rounded-lg text-sm shadow-sm transition-colors duration-150'
+          >
+            <LucideHeart
+              fill={isFavorite ? 'red' : 'none'}
+              stroke={isFavorite ? 'red' : 'gray'}
+            />
             관심해제
           </Button>
         </div>

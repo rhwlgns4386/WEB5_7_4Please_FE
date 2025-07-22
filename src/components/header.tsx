@@ -8,6 +8,9 @@ export default function Header() {
   const goToRegisterProduct = () => {
     navigate({ to: '/registerProduct' });
   };
+  const goToMyPage = () => {
+    navigate({ to: '/mypage' });
+  };
   return (
     <div className='w-full flex justify-between items-center py-4 px-8 border-b border-gray-200 fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-950'>
       <Link to='/'>
@@ -29,7 +32,9 @@ export default function Header() {
         <Button variant={'outline'} onClick={goToRegisterProduct}>
           판매하기
         </Button>
-        <Button variant={'outline'}>마이페이지</Button>
+        <Button variant={'outline'} onClick={goToMyPage}>
+          마이페이지
+        </Button>
         <span className='text-md text-white underline underline-offset-4'>
           김진우님
         </span>

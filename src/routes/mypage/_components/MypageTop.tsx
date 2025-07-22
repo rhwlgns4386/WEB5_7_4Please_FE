@@ -1,3 +1,4 @@
+import { StarRating } from '@/components/ui/star-rating';
 import DeleteUserConfirmModal from '@/routes/mypage/_components/DeleteUserConfirmModal';
 import ModifyUserInfoModal from '@/routes/mypage/_components/ModifyUserInfoModal';
 
@@ -15,8 +16,12 @@ export default function MypageTop() {
           </span>
         </div>
         <div>
-          <div>
-            <span>신뢰도</span>
+          <div className='flex gap-2 flex-col border border-gray-200 rounded-lg p-4'>
+            <div className='flex items-center gap-2 justify-between'>
+              <span className='text-sm text-muted-foreground'>신뢰도</span>
+              <span className='text-2xl font-bold'>4.5</span>
+            </div>
+            <StarRating readonly={true} value={4.5} size='sm' />
           </div>
         </div>
       </div>

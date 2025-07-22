@@ -10,12 +10,15 @@ import { popularProducts } from '@/routes/(index)/_constants/products';
 import { LucideChevronRight } from 'lucide-react';
 import ProductCard from './ProductCard';
 import { useNavigate } from '@tanstack/react-router';
+import useWishlist from '@/routes/(index)/hooks/useWishlist';
 
 export default function HotProductsSection() {
   const navigate = useNavigate();
+  const { registerWishList } = useWishlist();
   const handleHeartClick = (productId: number) => {
     // 여기에 관심상품 토글 로직 추가
     console.log('관심상품 토글:', productId);
+    registerWishList({ auctionId: productId });
   };
 
   const seeAllProducts = () => {

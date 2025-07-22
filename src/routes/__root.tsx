@@ -1,6 +1,8 @@
 import { ThemeProvider } from '@/components/theme-provider';
 import Header from '@/components/header';
 import { createRootRoute, Outlet, useMatches } from '@tanstack/react-router';
+import { Toaster } from 'sonner';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 export const Route = createRootRoute({
   component: () => {
@@ -10,14 +12,25 @@ export const Route = createRootRoute({
       match => (match.staticData as any)?.hideHeader
     );
 
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          refetchOnWindowFocus: false,
+        },
+      },
+    });
+
     return (
       <ThemeProvider defaultTheme='dark' storageKey='vite-ui-theme'>
-        <div className='min-h-screen'>
-          {!hideHeader && <Header />}
-          <main className={!hideHeader ? 'pt-[64px]' : ''}>
-            <Outlet />
-          </main>
-        </div>
+        <QueryClientProvider client={queryClient}>
+          <div className='min-h-screen'>
+            {!hideHeader && <Header />}
+            <main className={!hideHeader ? 'pt-[64px]' : ''}>
+              <Outlet />
+            </main>
+          </div>
+          <Toaster />
+        </QueryClientProvider>
       </ThemeProvider>
     );
   },

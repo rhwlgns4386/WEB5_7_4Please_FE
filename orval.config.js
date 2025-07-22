@@ -1,6 +1,7 @@
 module.exports = {
   api: {
-    input: 'https://rhwlgns4386.github.io/WEB5_7_4Please_API/openapi.json',
+    input:
+      'http://ec2-13-124-234-108.ap-northeast-2.compute.amazonaws.com/swagger-ui/index.html',
     output: {
       // API를 태그 기준으로 파일을 분리하여 생성합니다.
       mode: 'tags-split',
@@ -17,7 +18,7 @@ module.exports = {
           // 이전에 만든 axios 설정 파일 경로입니다.
           path: './src/lib/axiosConfig.ts',
           // axios 설정 파일에서 `export default`로 내보냈으므로 'default'를 사용합니다.
-          name: 'default',
+          name: 'request',
         },
         // tanstack-query v5에 맞게 옵션을 설정합니다.
         query: {
