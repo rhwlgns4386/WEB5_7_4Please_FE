@@ -1,7 +1,7 @@
-import { request } from '@/lib/axiosConfig';
+import { requests } from '@/lib/axiosConfig';
 
 export const createWishList = ({ auctionId }: { auctionId: number }) => {
-  return request({
+  return requests({
     url: '/api/v1/wishlist',
     method: 'POST',
     data: {

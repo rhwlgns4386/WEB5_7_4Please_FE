@@ -3,20 +3,10 @@ import { Badge } from '@/components/ui/badge';
 import { Heart } from 'lucide-react';
 import { useState } from 'react';
 import ProductImagePlaceholder from './ProductImagePlaceholder';
-
-interface Product {
-  id: number;
-  title: string;
-  price: string;
-  tag: string;
-  timeLeft: string;
-  bidCount: number;
-  image: string;
-  liked: boolean;
-}
+import type { AuctionItem } from '@/types';
 
 interface ProductCardProps {
-  product: Product;
+  product: AuctionItem;
   theme?: 'light' | 'dark';
   onHeartClick?: (productId: number) => void;
 }
@@ -64,6 +54,8 @@ export default function ProductCard({
     setImageLoading(false);
   };
 
+  console.log(product.thumbnailUrl);
+
   return (
     <Card
       className={`w-full h-auto overflow-hidden border shadow-sm hover:shadow-md transition-shadow ${
@@ -72,7 +64,10 @@ export default function ProductCard({
     >
       <div className='aspect-square relative overflow-hidden group'>
         {imageError ? (
-          <ProductImagePlaceholder category={product.tag} isDark={isDark} />
+          <ProductImagePlaceholder
+            category={product.category.name}
+            isDark={isDark}
+          />
         ) : (
           <>
             {imageLoading && (
@@ -91,8 +86,8 @@ export default function ProductCard({
               </div>
             )}
             <img
-              src={product.image}
-              alt={product.title}
+              src={product.thumbnailUrl}
+              alt={product.name}
               className='w-full h-full object-cover'
               onError={handleImageError}
               onLoad={handleImageLoad}
@@ -108,13 +103,13 @@ export default function ProductCard({
           }`}
           onClick={e => {
             e.stopPropagation();
-            onHeartClick?.(product.id);
+            onHeartClick?.(product.auctionId);
           }}
         >
           <Heart
             size={16}
             className={`transition-colors duration-200 ${
-              product.liked
+              product.isWishlist
                 ? isDark
                   ? 'fill-red-400 text-red-400'
                   : 'fill-red-500 text-red-500'
@@ -129,9 +124,9 @@ export default function ProductCard({
         <div className='mb-1'>
           <Badge
             variant='outline'
-            className={`text-xs font-medium ${getCategoryBadgeColor(product.tag, isDark)}`}
+            className={`text-xs font-medium ${getCategoryBadgeColor(product.category.name, isDark)}`}
           >
-            {product.tag}
+            {product.category.name}
           </Badge>
         </div>
         <h3
@@ -139,7 +134,7 @@ export default function ProductCard({
             isDark ? 'text-white' : 'text-gray-900'
           }`}
         >
-          {product.title}
+          {product.name}
         </h3>
         <div className='flex items-center gap-1'>
           <span
@@ -147,7 +142,7 @@ export default function ProductCard({
               isDark ? 'text-orange-400' : 'text-orange-500'
             }`}
           >
-            {product.price}
+            {product.instantPrice.toLocaleString()}
           </span>
           <span
             className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}
@@ -160,7 +155,7 @@ export default function ProductCard({
             isDark ? 'text-gray-400' : 'text-gray-500'
           }`}
         >
-          <span>⏰ {product.timeLeft}</span>
+          <span>⏰ {product.endTime}</span>
           <span>{product.bidCount}명 입찰</span>
         </div>
       </CardContent>

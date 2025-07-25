@@ -24,7 +24,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import useCreateAuction from '@/routes/registerProduct/hooks/useCreateAuction';
 
 export const Route = createFileRoute('/registerProduct/')({
   component: RegisterProductPage,
@@ -46,8 +45,6 @@ export default function RegisterProductPage() {
     form,
     handleFormSubmit,
   } = useImageUpload();
-
-  const { postAuction } = useCreateAuction();
 
   return (
     <div className='relative'>
@@ -318,21 +315,40 @@ export default function RegisterProductPage() {
                   <h2 className='text-xl font-bold'>시작일</h2>
                 </div>
 
-                <FormField
-                  control={form.control}
-                  name='startDate'
-                  render={({ field }) => (
-                    <FormItem className='mb-6'>
-                      <FormControl>
-                        <DatePicker
-                          value={field.value}
-                          onChange={field.onChange}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <div className='flex gap-2'>
+                  <FormField
+                    control={form.control}
+                    name='startDate'
+                    render={({ field }) => (
+                      <FormItem className='mb-6'>
+                        <FormControl>
+                          <DatePicker
+                            value={field.value}
+                            onChange={field.onChange}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name='startTime'
+                    render={({ field }) => (
+                      <FormItem className='mb-6'>
+                        <FormControl>
+                          <Input
+                            value={field.value}
+                            onChange={field.onChange}
+                            type='time'
+                            step={'1'}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
                 <div className='border-2 border-red-300 rounded-lg p-4 mb-6'>
                   <div className='flex items-center gap-2 mb-3'>
@@ -351,13 +367,13 @@ export default function RegisterProductPage() {
                             className='flex gap-6'
                           >
                             <div className='flex items-center space-x-2'>
-                              <RadioGroupItem value='3' id='3days' />
+                              <RadioGroupItem value='THREE' id='3days' />
                               <Label htmlFor='3days' className='font-medium'>
                                 3일
                               </Label>
                             </div>
                             <div className='flex items-center space-x-2'>
-                              <RadioGroupItem value='5' id='5days' />
+                              <RadioGroupItem value='FIVE' id='5days' />
                               <Label htmlFor='5days' className='font-medium'>
                                 5일
                               </Label>

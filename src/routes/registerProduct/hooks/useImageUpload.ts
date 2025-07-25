@@ -2,6 +2,9 @@ import { useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useMutation } from '@tanstack/react-query';
+import { postAuction } from '@/api/auction';
+import { toast } from 'sonner';
 
 export default function useImageUpload() {
   const thumbnailRef = useRef<HTMLInputElement>(null);
@@ -11,6 +14,12 @@ export default function useImageUpload() {
   const [productImages, setProductImages] = useState<File[]>([]);
   const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
   const [productImagesUrl, setProductImagesUrl] = useState<string[]>([]);
+
+  const { mutate: createAuction } = useMutation({
+    mutationFn: postAuction,
+    onSuccess: () => toast('성공적으로 등록되었습니다.'),
+    onError: () => toast('등록에 실패했습니다.'),
+  });
 
   const formSchema = z
     .object({
@@ -43,7 +52,12 @@ export default function useImageUpload() {
 
       // 경매 설정
       startDate: z.string().min(1, { message: '경매 시작일을 선택해주세요.' }),
-      bidPeriod: z.enum(['3', '5'], { message: '경매 기간을 선택해주세요.' }),
+      startTime: z
+        .string()
+        .min(1, { message: '경매 시작 시간을 선택해주세요.' }),
+      bidPeriod: z.enum(['THREE', 'FIVE'], {
+        message: '경매 기간을 선택해주세요.',
+      }),
       startingPrice: z
         .number({ message: '시작가를 입력해주세요.' })
         .min(1000, { message: '시작가는 1,000원 이상이어야 합니다.' }),
@@ -68,7 +82,8 @@ export default function useImageUpload() {
       addressDetail: '',
       phone: '',
       startDate: '',
-      bidPeriod: '3',
+      startTime: '',
+      bidPeriod: 'THREE',
       startingPrice: 1000,
       buyNowPrice: 10000,
     },
@@ -136,25 +151,27 @@ export default function useImageUpload() {
   };
 
   const handleFormSubmit = (data: z.infer<typeof formSchema>) => {
-    console.log('폼 데이터:', data);
-    console.log('썸네일 파일:', thumbnail);
-    console.log('상품 이미지 파일들:', productImages);
-
-    // 여기에 실제 백엔드 API 호출 로직을 추가
-    // const formData = new FormData();
-    // Object.entries(data).forEach(([key, value]) => {
-    //   formData.append(key, value.toString());
-    // });
-    // if (thumbnail) formData.append('thumbnail', thumbnail);
-    // productImages.forEach((image, index) => {
-    //   formData.append(`productImages`, image);
-    // });
-    //
-    // // API 호출
-    // fetch('/api/products', {
-    //   method: 'POST',
-    //   body: formData
-    // });
+    createAuction({
+      data: {
+        productName: data.productName,
+        description: data.description,
+        thumbnailUrl:
+          'https://www.firstintuition.co.uk/wp-content/uploads/2021/05/mockexams-23-e1683712355172.png',
+        imageUrls: [
+          'https://www.firstintuition.co.uk/wp-content/uploads/2021/05/mockexams-23-e1683712355172.png',
+          'https://www.firstintuition.co.uk/wp-content/uploads/2021/05/mockexams-23-e1683712355172.png',
+        ],
+        categoryId: Number(data.categoryId),
+        address: data.address,
+        addressDetail: data.addressDetail,
+        zipCode: data.zipCode,
+        phone: data.phone,
+        startDate: `${data.startDate}T${data.startTime}`,
+        bidPeriod: data.bidPeriod,
+        startingPrice: data.startingPrice,
+        buyNowPrice: data.buyNowPrice,
+      },
+    });
   };
 
   return {

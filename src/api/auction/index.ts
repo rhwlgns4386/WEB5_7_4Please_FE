@@ -1,6 +1,31 @@
-import { request } from '@/lib/axiosConfig';
-import type { CreateAuctionRequest } from '@/types';
+import { requests } from '@/lib/axiosConfig';
+import type { AuctionList, CreateAuctionRequest } from '@/types';
+import type { AxiosResponse } from 'axios';
 
-export const createAuction = ({ data }: { data: CreateAuctionRequest }) => {
-  return request.post('/api/v1/auctions', data);
+export const postAuction = ({ data }: { data: CreateAuctionRequest }) => {
+  return requests({
+    url: '/api/v1/auctions',
+    method: 'POST',
+    data,
+  });
+};
+
+export const getAuctions = ({
+  page,
+  size,
+  keyword,
+  categoryId,
+  order,
+}: {
+  page: number;
+  size: number;
+  keyword: string;
+  categoryId: number | undefined;
+  order: string;
+}): Promise<AxiosResponse<AuctionList>> => {
+  return requests({
+    url: '/api/v1/auctions',
+    method: 'GET',
+    params: { page, size, keyword, categoryId, order },
+  });
 };

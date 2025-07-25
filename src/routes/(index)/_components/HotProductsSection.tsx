@@ -6,19 +6,20 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel';
-import { popularProducts } from '@/routes/(index)/_constants/products';
 import { LucideChevronRight } from 'lucide-react';
 import ProductCard from './ProductCard';
 import { useNavigate } from '@tanstack/react-router';
 import useWishlist from '@/routes/(index)/hooks/useWishlist';
+import useProductList from '@/routes/(index)/hooks/useProductList';
+import type { AuctionItem } from '@/types';
 
 export default function HotProductsSection() {
   const navigate = useNavigate();
   const { registerWishList } = useWishlist();
-  const handleHeartClick = (productId: number) => {
-    // 여기에 관심상품 토글 로직 추가
-    console.log('관심상품 토글:', productId);
-    registerWishList({ auctionId: productId });
+  const { data: productsData } = useProductList();
+
+  const handleHeartClick = (auctionId: number) => {
+    registerWishList({ auctionId });
   };
 
   const seeAllProducts = () => {
@@ -52,9 +53,9 @@ export default function HotProductsSection() {
             className='w-full'
           >
             <CarouselContent className='-ml-2 md:-ml-4'>
-              {popularProducts.map((product, index) => (
+              {productsData?.data?.content?.map((product: AuctionItem) => (
                 <CarouselItem
-                  key={index}
+                  key={product.auctionId}
                   className='pl-2 md:pl-4 basis-[280px] sm:basis-[300px] md:basis-[320px] lg:basis-[350px]'
                 >
                   <ProductCard

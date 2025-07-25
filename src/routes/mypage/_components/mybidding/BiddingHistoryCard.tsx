@@ -1,3 +1,4 @@
+import PaymentModal from '@/components/payment-modal';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { SellerReviewModal } from '@/routes/mypage/_components/SellerReviewModal';
@@ -44,10 +45,7 @@ export default function BiddingHistoryCard({ status }: Props) {
     ),
     PENDING: () => (
       <div className='flex gap-2 w-full items-center justify-end mt-4'>
-        <Button variant={'outline'}>
-          <LucideIdCard />
-          결제하기
-        </Button>
+        <PaymentModal />
         <Button variant={'outline'}>낙찰 포기</Button>
       </div>
     ),
