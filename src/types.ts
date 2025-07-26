@@ -74,3 +74,124 @@ export interface SignupResponse {
   accessToken: string;
   redirectUrl: string;
 }
+
+export interface SigninResponse {
+  message: string;
+  accessToken: string;
+  redirectUrl: string;
+}
+
+export type SigninType = 'google' | 'naver';
+
+export interface ProductDetail {
+  highestBidPrice: number;
+  instantBidPrice: number;
+  bidCount: number;
+  startingPrice: number;
+  productName: string;
+  categoryId: number;
+  categoryName: string;
+  description: string;
+  endTime: string;
+  thumbnailUrl: string;
+  imageUrls: string[];
+}
+
+export interface WishList {
+  content: {
+    wishlistId: number;
+    auctionId: number;
+    thumbnailUrl: string;
+    name: string;
+    maxPrice: number;
+    bidCount: number;
+    createdAt: string;
+  }[];
+  page: number;
+  size: number;
+  totalPages: number;
+  totalElements: number;
+}
+
+export interface Pageable {
+  page: number;
+  size: number;
+  sort: string[];
+}
+
+export interface BidList {
+  content: {
+    auctionId: number;
+    bidId: number;
+    memberId: number;
+    bidderName: string;
+    bidPrice: number;
+    bidTime: string;
+    isSuccessfulBidder: boolean;
+  }[];
+  page: number;
+  size: number;
+  totalPages: number;
+  totalElements: number;
+}
+
+//FIXME: 알림 리스트 타입 수정해야함.
+export interface NotificationList {
+  content: {
+    notificationId: number;
+    message: string;
+    createdAt: string;
+  }[];
+}
+
+export interface NotificationFive {
+  pushNotificationResponses: {
+    id: number;
+    isRead: boolean;
+    type: string;
+    data: Record<string, string>;
+  }[];
+}
+
+export interface Order {
+  imageUrl: string;
+  productName: string;
+  deliveryRequest: string;
+  recipient: string;
+  sellerName: string;
+  address: string;
+  addressDetail: string;
+  zipCode: string;
+  phone: string;
+  price: number;
+}
+
+export interface OrderUpdateRequest {
+  address: string;
+  addressDetail: string;
+  zipCode: string;
+  phone: string;
+  content: string;
+  receiver: string;
+}
+
+export interface Shipment {
+  shipmentId: number;
+  auctionId: number;
+  address: string;
+  addressDetail: string;
+  zipCode: string;
+  phone: string;
+  content: string;
+  receiver: string;
+}
+
+export interface Payment {
+  paymentKey: string;
+  orderId: string;
+  amount: number;
+}
+
+export interface SocialLoginResponse {
+  redirect: string;
+}

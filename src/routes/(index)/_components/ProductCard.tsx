@@ -142,7 +142,14 @@ export default function ProductCard({
               isDark ? 'text-orange-400' : 'text-orange-500'
             }`}
           >
-            {product.instantPrice.toLocaleString()}
+            {product.instantPrice ? (
+              <span className='text-sm'>
+                <span className='text-gray-500 mr-2 text-xs'>즉시구매가</span>
+                {product.instantPrice.toLocaleString()}
+              </span>
+            ) : (
+              product.maxPrice.toLocaleString()
+            )}
           </span>
           <span
             className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}

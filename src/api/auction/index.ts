@@ -1,5 +1,5 @@
 import { requests } from '@/lib/axiosConfig';
-import type { AuctionList, CreateAuctionRequest } from '@/types';
+import type { AuctionList, CreateAuctionRequest, ProductDetail } from '@/types';
 import type { AxiosResponse } from 'axios';
 
 export const postAuction = ({ data }: { data: CreateAuctionRequest }) => {
@@ -38,5 +38,23 @@ export const s3Upload = (formData: FormData) => {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
+  });
+};
+
+export const getProductDetail = ({
+  auctionId,
+}: {
+  auctionId: number;
+}): Promise<AxiosResponse<ProductDetail>> => {
+  return requests({
+    url: `/api/v1/auctions/${auctionId}/description`,
+    method: 'GET',
+  });
+};
+
+export const deleteAuction = ({ auctionId }: { auctionId: number }) => {
+  return requests({
+    url: `/api/v1/auctions/${auctionId}`,
+    method: 'DELETE',
   });
 };

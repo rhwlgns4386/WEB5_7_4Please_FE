@@ -1,4 +1,4 @@
-import { createWishList } from '@/api/member';
+import { createWishList } from '@/api/wishlist';
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
