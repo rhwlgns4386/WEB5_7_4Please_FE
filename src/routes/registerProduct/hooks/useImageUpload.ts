@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { useMutation } from '@tanstack/react-query';
 import { postAuction } from '@/api/auction';
 import { toast } from 'sonner';
+import useS3Upload from '@/hooks/useS3Upload';
 
 export default function useImageUpload() {
   const thumbnailRef = useRef<HTMLInputElement>(null);
@@ -20,6 +21,8 @@ export default function useImageUpload() {
     onSuccess: () => toast('성공적으로 등록되었습니다.'),
     onError: () => toast('등록에 실패했습니다.'),
   });
+
+  const { uploadFileMutation } = useS3Upload();
 
   const formSchema = z
     .object({
@@ -105,11 +108,16 @@ export default function useImageUpload() {
     const file = e.target.files?.[0];
     if (file) {
       setThumbnail(file);
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => {
-        setThumbnailUrl(reader.result as string);
-      };
+      const blob = new Blob([JSON.stringify(file)], {
+        type: 'application/json',
+      });
+      const formData = new FormData();
+      formData.append('image', blob);
+      uploadFileMutation(formData, {
+        onSuccess: (data: any) => {
+          setThumbnailUrl(data.data[0]);
+        },
+      });
     }
   };
 
@@ -119,20 +127,14 @@ export default function useImageUpload() {
     const files = e.target.files;
     if (files) {
       setProductImages(Array.from(files));
-      const urls = Array.from(files).map(file => {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.readAsDataURL(file);
-          reader.onload = () => {
-            resolve(reader.result as string);
-          };
-          reader.onerror = error => {
-            reject(error);
-          };
-        });
+      const formData = new FormData();
+      Array.from(files).forEach(file => {
+        formData.append('image', file);
       });
-      Promise.all(urls).then(results => {
-        setProductImagesUrl(results as string[]);
+      uploadFileMutation(formData, {
+        onSuccess: (data: any) => {
+          setProductImagesUrl(data.data);
+        },
       });
     }
   };
@@ -151,16 +153,21 @@ export default function useImageUpload() {
   };
 
   const handleFormSubmit = (data: z.infer<typeof formSchema>) => {
+    if (!thumbnailUrl) {
+      toast.error('썸네일 이미지를 등록해주세요.');
+      return;
+    }
+    if (productImagesUrl.length === 0) {
+      toast.error('상품 이미지를 1개 이상 등록해주세요.');
+      return;
+    }
+
     createAuction({
       data: {
         productName: data.productName,
         description: data.description,
-        thumbnailUrl:
-          'https://www.firstintuition.co.uk/wp-content/uploads/2021/05/mockexams-23-e1683712355172.png',
-        imageUrls: [
-          'https://www.firstintuition.co.uk/wp-content/uploads/2021/05/mockexams-23-e1683712355172.png',
-          'https://www.firstintuition.co.uk/wp-content/uploads/2021/05/mockexams-23-e1683712355172.png',
-        ],
+        thumbnailUrl: thumbnailUrl,
+        imageUrls: productImagesUrl,
         categoryId: Number(data.categoryId),
         address: data.address,
         addressDetail: data.addressDetail,

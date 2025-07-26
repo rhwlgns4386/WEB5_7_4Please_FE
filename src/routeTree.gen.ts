@@ -17,6 +17,7 @@ import { Route as MypageIndexRouteImport } from './routes/mypage/index'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as indexIndexRouteImport } from './routes/(index)/index'
 import { Route as ProductsIdRouteImport } from './routes/products/$id'
+import { Route as AuthNaverIndexRouteImport } from './routes/auth/naver/index'
 import { Route as AuthGoogleIndexRouteImport } from './routes/auth/google/index'
 
 const LoginRoute = LoginRouteImport.update({
@@ -59,6 +60,11 @@ const ProductsIdRoute = ProductsIdRouteImport.update({
   path: '/products/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthNaverIndexRoute = AuthNaverIndexRouteImport.update({
+  id: '/auth/naver/',
+  path: '/auth/naver/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthGoogleIndexRoute = AuthGoogleIndexRouteImport.update({
   id: '/auth/google/',
   path: '/auth/google/',
@@ -75,6 +81,7 @@ export interface FileRoutesByFullPath {
   '/registerProduct': typeof RegisterProductIndexRoute
   '/signup': typeof SignupIndexRoute
   '/auth/google': typeof AuthGoogleIndexRoute
+  '/auth/naver': typeof AuthNaverIndexRoute
 }
 export interface FileRoutesByTo {
   '/products/$id': typeof ProductsIdRoute
@@ -85,6 +92,7 @@ export interface FileRoutesByTo {
   '/registerProduct': typeof RegisterProductIndexRoute
   '/signup': typeof SignupIndexRoute
   '/auth/google': typeof AuthGoogleIndexRoute
+  '/auth/naver': typeof AuthNaverIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -97,6 +105,7 @@ export interface FileRoutesById {
   '/registerProduct/': typeof RegisterProductIndexRoute
   '/signup/': typeof SignupIndexRoute
   '/auth/google/': typeof AuthGoogleIndexRoute
+  '/auth/naver/': typeof AuthNaverIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -110,6 +119,7 @@ export interface FileRouteTypes {
     | '/registerProduct'
     | '/signup'
     | '/auth/google'
+    | '/auth/naver'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/products/$id'
@@ -120,6 +130,7 @@ export interface FileRouteTypes {
     | '/registerProduct'
     | '/signup'
     | '/auth/google'
+    | '/auth/naver'
   id:
     | '__root__'
     | '/login'
@@ -131,6 +142,7 @@ export interface FileRouteTypes {
     | '/registerProduct/'
     | '/signup/'
     | '/auth/google/'
+    | '/auth/naver/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -142,6 +154,7 @@ export interface RootRouteChildren {
   RegisterProductIndexRoute: typeof RegisterProductIndexRoute
   SignupIndexRoute: typeof SignupIndexRoute
   AuthGoogleIndexRoute: typeof AuthGoogleIndexRoute
+  AuthNaverIndexRoute: typeof AuthNaverIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -202,6 +215,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth/naver/': {
+      id: '/auth/naver/'
+      path: '/auth/naver'
+      fullPath: '/auth/naver'
+      preLoaderRoute: typeof AuthNaverIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth/google/': {
       id: '/auth/google/'
       path: '/auth/google'
@@ -231,6 +251,7 @@ const rootRouteChildren: RootRouteChildren = {
   RegisterProductIndexRoute: RegisterProductIndexRoute,
   SignupIndexRoute: SignupIndexRoute,
   AuthGoogleIndexRoute: AuthGoogleIndexRoute,
+  AuthNaverIndexRoute: AuthNaverIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -29,3 +29,14 @@ export const getAuctions = ({
     params: { page, size, keyword, categoryId, order },
   });
 };
+
+export const s3Upload = (formData: FormData) => {
+  return requests({
+    url: '/api/v1/auctions/images',
+    method: 'POST',
+    data: formData,
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+};

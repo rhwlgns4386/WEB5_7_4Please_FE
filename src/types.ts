@@ -68,3 +68,9 @@ export interface AuctionListRequest {
   categoryId: number | undefined;
   order: 'latest' | 'bids' | 'timeout' | string;
 }
+
+export interface SignupResponse {
+  message: string;
+  accessToken: string;
+  redirectUrl: string;
+}

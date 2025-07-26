@@ -1,3 +1,4 @@
+import NicknameForm from '@/components/nickname-form';
 import { createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod';
 
@@ -6,14 +7,18 @@ export const Route = createFileRoute('/auth/google/')({
   validateSearch: z.object({
     code: z.string(),
   }),
+  staticData: {
+    hideHeader: true,
+  },
 });
 
 function RouteComponent() {
   const { code } = Route.useSearch();
+
   console.log(code);
   return (
-    <div>
-      <h1>Google Login</h1>
+    <div className='w-full h-full flex items-center justify-center mt-24'>
+      <NicknameForm token={code} />
     </div>
   );
 }
