@@ -1,10 +1,8 @@
 import { useGetSalesList } from '@/api/sale';
-import CommonSelect from '@/components/common-select';
 import { Button } from '@/components/ui/button';
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
@@ -63,6 +61,7 @@ export default function MySalesTab() {
             key={sale.auctionId}
             status={sale.status as SalesStatus}
             auctionId={sale.auctionId}
+            salesData={sale}
           />
         ))}
       </div>

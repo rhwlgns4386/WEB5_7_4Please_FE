@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { AxiosError, AxiosResponse } from 'axios';
 import { useNavigate } from '@tanstack/react-router';
 import { toast } from 'sonner';
+import { useUserStore } from '@/store/user';
 
 export const refreshToken = () => {
   return requests({
@@ -77,12 +78,13 @@ export const useDeleteMember = () => {
 
 export const useSocialLogin = () => {
   const navigate = useNavigate();
+  const { setAccessToken } = useUserStore();
   return useMutation({
     mutationFn: socialLogin,
     onSuccess: data => {
       const accessToken = data.headers.authorization?.split(' ')[1];
       if (accessToken) {
-        localStorage.setItem('accessToken', accessToken);
+        setAccessToken(accessToken);
         toast.success('로그인에 성공했습니다.');
         navigate({
           to: '/',

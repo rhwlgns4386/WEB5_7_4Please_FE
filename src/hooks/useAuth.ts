@@ -1,10 +1,47 @@
-import { signup } from '@/api/member';
-import { useMutation } from '@tanstack/react-query';
+import { useLogout } from '@/api/auth';
+import { getNickname } from '@/api/member';
+import { useUserStore } from '@/store/user';
+import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
+import { useEffect } from 'react';
 import { toast } from 'sonner';
 
 export default function useAuth() {
   const navigate = useNavigate();
+  const { accessToken, user, setUser, clearUser } = useUserStore();
+
+  const isLoggedIn = !!accessToken;
+
+  const { data: userData, isSuccess } = useQuery({
+    queryKey: ['member', accessToken],
+    queryFn: getNickname,
+    select: res => res.data,
+    enabled: isLoggedIn && !user, // 로그인 상태이고, 스토어에 유저 정보가 없을 때만 실행
+  });
+
+  useEffect(() => {
+    if (isSuccess && userData) {
+      setUser(userData);
+    }
+  }, [isSuccess, userData, setUser]);
+
+  const { mutate: logoutMutation } = useLogout();
+
+  const logout = () => {
+    logoutMutation(undefined, {
+      onSuccess: () => {
+        clearUser();
+        toast.success('로그아웃 되었습니다.');
+        navigate({ to: '/' });
+      },
+      onError: () => {
+        toast.error('로그아웃 중 오류가 발생했습니다.');
+      },
+    });
+  };
+
+  // 소셜 로그인 관련 로직은 로그인 페이지에서 직접 사용하도록 분리하는 것을 고려해볼 수 있습니다.
+  // 우선은 유지합니다.
   const handleClickGoogleLogin = () => {
     const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
     const GOOGLE_REDIRECT_URI = import.meta.env.VITE_GOOGLE_REDIRECT_URI;
@@ -21,23 +58,11 @@ export default function useAuth() {
     window.location.href = NAVER_AUTH_URL;
   };
 
-  const { mutate: signupMutation } = useMutation({
-    mutationFn: signup,
-    onSuccess: data => {
-      toast.success('회원가입이 완료되었습니다.');
-      if (data.data.accessToken) {
-        localStorage.setItem('token', data.data.accessToken);
-      }
-      navigate({ to: data.data.redirectUrl });
-    },
-    onError: error => {
-      toast.error('회원가입 중 오류가 발생했습니다.');
-    },
-  });
-
   return {
+    isLoggedIn,
+    user,
+    logout,
     handleClickGoogleLogin,
     handleClickNaverLogin,
-    signupMutation,
   };
 }

@@ -13,8 +13,6 @@ export const Route = createFileRoute('/auth/naver/')({
 
 function RouteComponent() {
   const { code, state } = Route.useSearch();
-  console.log({ code });
-  console.log({ state });
 
   const { mutate: socialLoginMutation } = useSocialLogin();
 

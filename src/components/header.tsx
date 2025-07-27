@@ -1,9 +1,13 @@
 import { Button } from '@/components/ui/button';
 import Logo from '@/assets/logo.svg?react';
 import { Link, useNavigate } from '@tanstack/react-router';
+import { useUserStore } from '@/store/user';
+import useAuth from '@/hooks/useAuth';
 
 export default function Header() {
   const navigate = useNavigate();
+  const { user, accessToken } = useUserStore();
+  const { logout } = useAuth();
 
   const goToRegisterProduct = () => {
     navigate({ to: '/registerProduct' });
@@ -17,28 +21,32 @@ export default function Header() {
         <div className='flex items-center gap-2'>
           <Logo />
           <span className='text-2xl font-bold'>Deal4U</span>
-
           <span className='text-md text-gray-500'>당신을 위한 거래</span>
         </div>
       </Link>
-      {/* <div>
-        <Button variant='outline'>
-          <Link to='/login'>
+
+      {accessToken ? (
+        <div className='flex items-center gap-2'>
+          <Button variant={'outline'} onClick={goToRegisterProduct}>
+            판매하기
+          </Button>
+          <Button variant={'outline'} onClick={goToMyPage}>
+            마이페이지
+          </Button>
+          <Button variant={'outline'} onClick={logout}>
+            로그아웃
+          </Button>
+          <span className='text-md text-white underline underline-offset-4'>
+            {user?.nickName}님
+          </span>
+        </div>
+      ) : (
+        <div>
+          <Button variant='outline' onClick={() => navigate({ to: '/login' })}>
             <span>로그인</span>
-          </Link>
-        </Button>
-      </div> */}
-      <div className='flex items-center gap-2'>
-        <Button variant={'outline'} onClick={goToRegisterProduct}>
-          판매하기
-        </Button>
-        <Button variant={'outline'} onClick={goToMyPage}>
-          마이페이지
-        </Button>
-        <span className='text-md text-white underline underline-offset-4'>
-          김진우님
-        </span>
-      </div>
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

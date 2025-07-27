@@ -1,3 +1,4 @@
+import { useUserStore } from '@/store/user';
 import axios from 'axios';
 
 export const requests = axios.create({
@@ -10,7 +11,7 @@ export const requests = axios.create({
 
 requests.interceptors.request.use(
   config => {
-    const accessToken = localStorage.getItem('accessToken');
+    const { accessToken } = useUserStore.getState();
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }

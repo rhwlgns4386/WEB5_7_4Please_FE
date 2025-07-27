@@ -7,6 +7,7 @@ import {
 } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import type { SaleContent } from '@/types';
 import { LucideTimer, LucideCrown, LucideSend } from 'lucide-react';
 
 export type SalesStatus =
@@ -21,9 +22,14 @@ export type SalesStatus =
 interface Props {
   status: SalesStatus;
   auctionId: number;
+  salesData: SaleContent;
 }
 
-export default function MySalesHistoryCard({ status, auctionId }: Props) {
+export default function MySalesHistoryCard({
+  status,
+  auctionId,
+  salesData,
+}: Props) {
   const bottomContentByStatusMapping = {
     OPEN: () => (
       <div className='flex justify-end mt-4 w-full'>

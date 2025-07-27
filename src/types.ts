@@ -61,17 +61,19 @@ export interface Pageable {
   sort?: string[];
 }
 
+export interface SaleContent {
+  auctionId: number;
+  thumbnailUrl: string;
+  name: string;
+  maxPrice: number;
+  startBidPrice: number;
+  description: string;
+  bidCount: number;
+  status: string;
+}
+
 export interface SaleList {
-  content: {
-    auctionId: number;
-    thumbnailUrl: string;
-    name: string;
-    maxPrice: number;
-    startBidPrice: number;
-    description: string;
-    bidCount: number;
-    status: string;
-  }[];
+  content: SaleContent[];
   page: number;
   size: number;
   totalPages: number;
