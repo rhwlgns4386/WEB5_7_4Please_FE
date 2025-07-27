@@ -2,7 +2,7 @@ import PaymentModal from '@/components/payment-modal';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { SellerReviewModal } from '@/routes/mypage/_components/SellerReviewModal';
-import { LucideAlertCircle, LucideIdCard, LucideTruck } from 'lucide-react';
+import { LucideAlertCircle, LucideTruck } from 'lucide-react';
 
 export type BiddingStatus =
   | 'OPEN'

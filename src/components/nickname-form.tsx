@@ -15,11 +15,11 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import useAuth from '@/hooks/useAuth';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import z from 'zod';
 import { Route } from '@/routes/auth/google';
+import { useSignup } from '@/api/member';
 
 const formSchema = z.object({
   nickName: z.string().min(1),
@@ -36,7 +36,7 @@ export default function NicknameForm({ token }: { token: string }) {
     },
   });
 
-  const { signupMutation } = useAuth();
+  const { mutate: signupMutation } = useSignup();
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     signupMutation({

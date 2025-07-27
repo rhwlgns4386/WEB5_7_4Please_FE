@@ -1,7 +1,5 @@
-import { useGetWishList } from '@/api/wishlist';
 import CommonSelect from '@/components/common-select';
 import { Badge } from '@/components/ui/badge';
-import { usePagination } from '@/hooks/usePagination';
 import MyFavoriteCard from '@/routes/mypage/_components/myFavorite/MyFavoriteCard';
 import { LucideHeart } from 'lucide-react';
 
@@ -16,19 +14,6 @@ export default function MyFavoriteTab() {
     { value: 'ten', label: '10개씩 보기' },
     { value: 'twenty', label: '20개씩 보기' },
   ];
-
-  const {
-    currentPage,
-    totalPages,
-    setTotalPages,
-    goToPage,
-    nextPage,
-    prevPage,
-    canGoNext,
-    canGoPrev,
-  } = usePagination();
-
-  const { data: favoriteList } = useGetWishList(currentPage, 5);
 
   return (
     <div className='flex flex-col gap-4'>

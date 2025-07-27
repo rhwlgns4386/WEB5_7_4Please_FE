@@ -27,11 +27,11 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
-import useAuth from '@/hooks/useAuth';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useForm } from 'react-hook-form';
 import z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useSignup } from '@/api/member';
 
 export const Route = createFileRoute('/signup/')({
   component: RouteComponent,
@@ -46,7 +46,8 @@ export const Route = createFileRoute('/signup/')({
 function RouteComponent() {
   const navigate = useNavigate();
   const { token } = Route.useSearch();
-  const { signupMutation } = useAuth();
+
+  const { mutate: signupMutation } = useSignup();
 
   const formSchema = z.object({
     nickname: z

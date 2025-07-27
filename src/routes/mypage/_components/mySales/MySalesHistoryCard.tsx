@@ -25,11 +25,7 @@ interface Props {
   salesData: SaleContent;
 }
 
-export default function MySalesHistoryCard({
-  status,
-  auctionId,
-  salesData,
-}: Props) {
+export default function MySalesHistoryCard({ status, auctionId }: Props) {
   const bottomContentByStatusMapping = {
     OPEN: () => (
       <div className='flex justify-end mt-4 w-full'>

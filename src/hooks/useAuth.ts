@@ -40,8 +40,6 @@ export default function useAuth() {
     });
   };
 
-  // 소셜 로그인 관련 로직은 로그인 페이지에서 직접 사용하도록 분리하는 것을 고려해볼 수 있습니다.
-  // 우선은 유지합니다.
   const handleClickGoogleLogin = () => {
     const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
     const GOOGLE_REDIRECT_URI = import.meta.env.VITE_GOOGLE_REDIRECT_URI;

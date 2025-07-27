@@ -11,12 +11,11 @@ import ProductCard from './ProductCard';
 import { useNavigate } from '@tanstack/react-router';
 import type { AuctionItem } from '@/types';
 import { useGetAuctionList } from '@/api/auction';
-import { useCreateWishList, useDeleteWishList } from '@/api/wishlist';
+import { useCreateWishList } from '@/api/wishlist';
 
 export default function ExpireProductsSection() {
   const navigate = useNavigate();
   const { mutate: createWishListMutation } = useCreateWishList();
-  const { mutate: deleteWishListMutation } = useDeleteWishList();
 
   const { data: productsData } = useGetAuctionList({
     page: 0,

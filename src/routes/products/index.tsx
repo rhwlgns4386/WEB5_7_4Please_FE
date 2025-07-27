@@ -56,8 +56,8 @@ function Products() {
 
   // 필터 UI의 입력 상태를 관리하기 위한 로컬 상태
   const [localCategory, setLocalCategory] = useState(searchParams.category);
-  const [localQuery, setLocalQuery] = useState(searchParams.query);
-  const [localSort, setLocalSort] = useState<SortType>(searchParams.sort);
+  const [localQuery, _setLocalQuery] = useState(searchParams.query);
+  const [localSort, _setLocalSort] = useState<SortType>(searchParams.sort);
 
   const { data: productList } = useGetAuctionList({
     page: searchParams.page,

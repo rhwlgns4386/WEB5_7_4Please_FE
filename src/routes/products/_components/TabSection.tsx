@@ -24,7 +24,7 @@ export default function TabSection({ productDetail }: TabSectionProps) {
           <BiddingHistoryTab />
         </TabsContent>
         <TabsContent value='sellerInfo'>
-          <SellerInfoTab productDetail={productDetail} />
+          <SellerInfoTab />
         </TabsContent>
       </div>
     </Tabs>
