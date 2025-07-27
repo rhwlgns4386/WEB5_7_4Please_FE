@@ -1,6 +1,9 @@
 import { requests } from '@/lib/axiosConfig';
 import type { SigninResponse, SigninType, SignupResponse } from '@/types';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from '@tanstack/react-router';
 import type { AxiosResponse } from 'axios';
+import { toast } from 'sonner';
 
 export const signup = ({
   token,
@@ -43,5 +46,62 @@ export const getNickname = () => {
   return requests({
     url: `/api/v1/member/check`,
     method: 'GET',
+  });
+};
+
+export const getLoginPage = ({ type }: { type: SigninType }) => {
+  return requests({
+    url: `/api/v1/login/page/${type}`,
+    method: 'GET',
+  });
+};
+
+// Tanstack Query Hooks
+
+export const useGetLoginPage = ({ type }: { type: SigninType }) => {
+  return useQuery({
+    queryKey: ['loginPage', type],
+    queryFn: () => getLoginPage({ type }),
+    select: data => data.data,
+  });
+};
+
+export const useGetNickname = () => {
+  return useQuery({
+    queryKey: ['member', 'nickname'],
+    queryFn: getNickname,
+    select: data => data.data,
+  });
+};
+
+export const useSignup = () => {
+  const navigate = useNavigate();
+  return useMutation({
+    mutationFn: signup,
+    onSuccess: data => {
+      localStorage.setItem('token', data.data.accessToken);
+      if (data.data.redirectUrl) {
+        navigate({
+          to: data.data.redirectUrl,
+        });
+      }
+    },
+    onError: error => {
+      toast.error('회원가입 중 오류가 발생했습니다.');
+    },
+  });
+};
+
+export const useSignin = () => {
+  return useMutation({ mutationFn: signin });
+};
+
+export const useUpdateNickname = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: updateNickname,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['member'] });
+    },
   });
 };

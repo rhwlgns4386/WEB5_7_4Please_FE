@@ -1,11 +1,13 @@
-import NicknameForm from '@/components/nickname-form';
+import { useSocialLogin } from '@/api/auth';
 import { createFileRoute } from '@tanstack/react-router';
+import { useEffect } from 'react';
 import { z } from 'zod';
 
 export const Route = createFileRoute('/auth/google/')({
   component: RouteComponent,
   validateSearch: z.object({
     code: z.string(),
+    state: z.string(),
   }),
   staticData: {
     hideHeader: true,
@@ -13,12 +15,21 @@ export const Route = createFileRoute('/auth/google/')({
 });
 
 function RouteComponent() {
-  const { code } = Route.useSearch();
+  const { code, state } = Route.useSearch();
+  console.log({ code });
+  console.log({ state });
 
-  console.log(code);
+  const { mutate: socialLoginMutation } = useSocialLogin();
+
+  useEffect(() => {
+    socialLoginMutation({
+      type: 'google',
+      code,
+      state,
+    });
+  }, [code, state, socialLoginMutation]);
+
   return (
-    <div className='w-full h-full flex items-center justify-center mt-24'>
-      <NicknameForm token={code} />
-    </div>
+    <div className='w-full h-full flex items-center justify-center mt-24'></div>
   );
 }

@@ -1,3 +1,4 @@
+import { useGetProductDetail } from '@/api/auction';
 import BiddingForm from '@/routes/products/_components/BiddingForm';
 import DetailHeader from '@/routes/products/_components/DetailHeader';
 import ImageLibrary from '@/routes/products/_components/ImageLibrary';
@@ -12,16 +13,19 @@ export const Route = createFileRoute('/products/$id')({
 });
 
 function RouteComponent() {
+  const { id } = Route.useParams();
+  const { data: productDetail } = useGetProductDetail(Number(id));
+
   return (
     <div className='bg-gray-800/50 p-10'>
       <DetailHeader />
       <div className='flex gap-10 mt-[69px] '>
         <div className='flex flex-col flex-2 gap-5'>
           <ImageLibrary />
-          <TabSection />
+          {productDetail && <TabSection productDetail={productDetail} />}
         </div>
         <div className='flex-1'>
-          <BiddingForm />
+          {productDetail && <BiddingForm productDetail={productDetail} />}
         </div>
       </div>
     </div>

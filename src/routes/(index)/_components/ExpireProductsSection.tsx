@@ -9,19 +9,30 @@ import {
 import { LucideChevronRight } from 'lucide-react';
 import ProductCard from './ProductCard';
 import { useNavigate } from '@tanstack/react-router';
-import useWishlist from '@/routes/(index)/hooks/useWishlist';
-import useProductList from '@/routes/(index)/hooks/useProductList';
 import type { AuctionItem } from '@/types';
+import { useGetAuctionList } from '@/api/auction';
+import { useCreateWishList, useDeleteWishList } from '@/api/wishlist';
 
 export default function ExpireProductsSection() {
   const navigate = useNavigate();
-  const { registerWishList } = useWishlist();
-  const { data: productsData } = useProductList();
-  const products = productsData?.data?.content;
+  const { mutate: createWishListMutation } = useCreateWishList();
+  const { mutate: deleteWishListMutation } = useDeleteWishList();
 
-  const handleHeartClick = (productId: number) => {
-    // 여기에 관심상품 토글 로직 추가
-    console.log('관심상품 토글:', productId);
+  const { data: productsData } = useGetAuctionList({
+    page: 0,
+    size: 12,
+    keyword: '',
+    categoryId: undefined,
+    order: 'timeout',
+  });
+  const products = productsData?.content;
+
+  const handleHeartClick = (auctionId: number) => {
+    if (localStorage.getItem('token')) {
+      createWishListMutation({ auctionId });
+    } else {
+      // deleteWishListMutation({ auctionId });
+    }
   };
 
   const seeAllProducts = () => {
@@ -65,7 +76,7 @@ export default function ExpireProductsSection() {
                   <ProductCard
                     product={product}
                     theme='dark'
-                    onHeartClick={handleHeartClick}
+                    onHeartClick={() => handleHeartClick(product.auctionId)}
                   />
                 </CarouselItem>
               ))}

@@ -1,13 +1,31 @@
+import { useGetReviews } from '@/api/review';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { usePagination } from '@/hooks/usePagination';
 import ReviewCard from '@/routes/products/_components/ReviewCard';
 import SalesHistoryModal from '@/routes/products/_components/modals/SalesHistoryModal';
+import type { ProductDetail } from '@/types';
 import { LucideChevronDown, LucideStar } from 'lucide-react';
 import { useState } from 'react';
 
-export default function SellerInfoTab() {
+interface SellerInfoTabProps {
+  productDetail: ProductDetail;
+}
+
+export default function SellerInfoTab({ productDetail }: SellerInfoTabProps) {
   const [isSalesHistoryModalOpen, setIsSalesHistoryModalOpen] = useState(false);
+  const {
+    currentPage,
+    totalPages,
+    setTotalPages,
+    goToPage,
+    nextPage,
+    prevPage,
+    canGoNext,
+    canGoPrev,
+  } = usePagination();
+  const { data: reviews } = useGetReviews(currentPage, 3);
 
   return (
     <>
@@ -20,7 +38,7 @@ export default function SellerInfoTab() {
                 <AvatarFallback>CN</AvatarFallback>
               </Avatar>
               <div>
-                <span className='text-lg font-bold'>김판매</span>
+                <span className='text-lg font-bold'>{}</span>
                 <div className='flex gap-1 items-center'>
                   <LucideStar
                     className='text-amber-300 fill-amber-300'

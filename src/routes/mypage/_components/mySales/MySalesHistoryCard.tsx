@@ -20,16 +20,16 @@ export type SalesStatus =
 
 interface Props {
   status: SalesStatus;
+  auctionId: number;
 }
 
-export default function MySalesHistoryCard({ status }: Props) {
+export default function MySalesHistoryCard({ status, auctionId }: Props) {
   const bottomContentByStatusMapping = {
     OPEN: () => (
       <div className='flex justify-end mt-4 w-full'>
-        <BiddingCancelConfirmModal />
+        <BiddingCancelConfirmModal auctionId={auctionId} />
       </div>
     ),
-    // TODO: 경매 완료 상태
     PENDING: () => (
       <div className='rounded-lg p-4 border border-gray-500 flex gap-2 mt-4'>
         <LucideTimer className='w-6 h-6' />

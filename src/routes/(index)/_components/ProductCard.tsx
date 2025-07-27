@@ -4,6 +4,8 @@ import { Heart } from 'lucide-react';
 import { useState } from 'react';
 import ProductImagePlaceholder from './ProductImagePlaceholder';
 import type { AuctionItem } from '@/types';
+import { useCountdown } from '@/hooks/useCountdown';
+import { useNavigate } from '@tanstack/react-router';
 
 interface ProductCardProps {
   product: AuctionItem;
@@ -44,6 +46,8 @@ export default function ProductCard({
   const isDark = theme === 'dark';
   const [imageError, setImageError] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
+  const timeLeft = useCountdown(product.endTime);
+  const navigate = useNavigate();
 
   const handleImageError = () => {
     setImageError(true);
@@ -54,11 +58,10 @@ export default function ProductCard({
     setImageLoading(false);
   };
 
-  console.log(product.thumbnailUrl);
-
   return (
     <Card
-      className={`w-full h-auto overflow-hidden border shadow-sm hover:shadow-md transition-shadow ${
+      onClick={() => navigate({ to: `/products/${product.auctionId}` })}
+      className={`w-full h-auto cursor-pointer overflow-hidden border shadow-sm hover:shadow-md transition-shadow ${
         isDark ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'
       }`}
     >
@@ -145,7 +148,9 @@ export default function ProductCard({
             {product.instantPrice ? (
               <span className='text-sm'>
                 <span className='text-gray-500 mr-2 text-xs'>즉시구매가</span>
-                {product.instantPrice.toLocaleString()}
+                <span className='text-lg font-bold'>
+                  {product.instantPrice.toLocaleString()}
+                </span>
               </span>
             ) : (
               product.maxPrice.toLocaleString()
@@ -162,7 +167,7 @@ export default function ProductCard({
             isDark ? 'text-gray-400' : 'text-gray-500'
           }`}
         >
-          <span>⏰ {product.endTime}</span>
+          <span>⏰ {timeLeft}</span>
           <span>{product.bidCount}명 입찰</span>
         </div>
       </CardContent>

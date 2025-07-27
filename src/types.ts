@@ -58,7 +58,24 @@ export interface ReviewList {
 export interface Pageable {
   page: number;
   size: number;
-  sort: string[];
+  sort?: string[];
+}
+
+export interface SaleList {
+  content: {
+    auctionId: number;
+    thumbnailUrl: string;
+    name: string;
+    maxPrice: number;
+    startBidPrice: number;
+    description: string;
+    bidCount: number;
+    status: string;
+  }[];
+  page: number;
+  size: number;
+  totalPages: number;
+  totalElements: number;
 }
 
 export interface AuctionListRequest {
@@ -84,6 +101,7 @@ export interface SigninResponse {
 export type SigninType = 'google' | 'naver';
 
 export interface ProductDetail {
+  auctionId: number;
   highestBidPrice: number;
   instantBidPrice: number;
   bidCount: number;
@@ -113,26 +131,22 @@ export interface WishList {
   totalElements: number;
 }
 
-export interface Pageable {
-  page: number;
-  size: number;
-  sort: string[];
-}
-
 export interface BidList {
-  content: {
-    auctionId: number;
-    bidId: number;
-    memberId: number;
-    bidderName: string;
-    bidPrice: number;
-    bidTime: string;
-    isSuccessfulBidder: boolean;
-  }[];
+  content: Bid[];
   page: number;
   size: number;
   totalPages: number;
   totalElements: number;
+}
+
+export interface Bid {
+  auctionId: number;
+  bidId: number;
+  memberId: number;
+  bidderName: string;
+  bidPrice: number;
+  bidTime: string;
+  isSuccessfulBidder: boolean;
 }
 
 //FIXME: 알림 리스트 타입 수정해야함.

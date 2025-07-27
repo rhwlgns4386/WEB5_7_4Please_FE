@@ -1,3 +1,4 @@
+import { useDeleteAuction } from '@/api/auction';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -10,7 +11,19 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 
-export default function BiddingCancelConfirmModal() {
+interface BiddingCancelConfirmModalProps {
+  auctionId: number;
+}
+
+export default function BiddingCancelConfirmModal({
+  auctionId,
+}: BiddingCancelConfirmModalProps) {
+  const { mutate: deleteAuction } = useDeleteAuction();
+
+  const handleCancel = () => {
+    deleteAuction({ auctionId });
+  };
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -25,7 +38,9 @@ export default function BiddingCancelConfirmModal() {
           <DialogClose asChild>
             <Button variant={'outline'}>취소</Button>
           </DialogClose>
-          <Button variant={'destructive'}>경매 취소</Button>
+          <Button variant={'destructive'} onClick={handleCancel}>
+            경매 취소
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

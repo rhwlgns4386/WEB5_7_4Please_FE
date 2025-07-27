@@ -3,6 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import BiddingPriceConfirmModal from '@/routes/products/_components/modals/BiddingPriceConfirmModal';
+import type { ProductDetail } from '@/types';
 import {
   LucideActivity,
   LucideAlertCircle,
@@ -19,7 +20,11 @@ type Status =
   | 'hasImmediatePaymentBuyer'
   | 'biddingEnded';
 
-export default function BiddingForm() {
+interface BiddingFormProps {
+  productDetail: ProductDetail;
+}
+
+export default function BiddingForm({ productDetail }: BiddingFormProps) {
   const [isBiddingPriceConfirmModalOpen, setIsBiddingPriceConfirmModalOpen] =
     useState(false);
   const [status, _setStatus] = useState<Status>(
@@ -32,18 +37,21 @@ export default function BiddingForm() {
         <div className='flex flex-col gap-4'>
           <div className='flex flex-col gap-4 items-center justify-center rounded-lg bg-white p-5'>
             <span className='text-sm text-gray-400'>현재 최고 입찰가</span>
-            <span className='text-2xl font-bold text-orange-500'>500000원</span>
+            <span className='text-2xl font-bold text-orange-500'>
+              {productDetail.highestBidPrice.toLocaleString()}원
+            </span>
             <span className='text-sm text-gray-400'>
-              시작가:500,000원 | 입찰25회
+              시작가:{productDetail.startingPrice.toLocaleString()}원 | 입찰
+              {productDetail.bidCount}회
             </span>
           </div>
           <div className='flex flex-col gap-4 items-center justify-center rounded-lg bg-white p-5'>
             <span className='text-sm text-gray-400'>즉시 입찰가</span>
             <span className='text-2xl font-bold text-orange-500'>
-              1200000원
+              {productDetail.instantBidPrice.toLocaleString()}원
             </span>
           </div>
-          <BiddingCancelConfirmModal />
+          <BiddingCancelConfirmModal auctionId={productDetail.auctionId} />
         </div>
       );
     },
@@ -52,9 +60,12 @@ export default function BiddingForm() {
         <div className='flex flex-col gap-4'>
           <div className='flex flex-col gap-4 items-center justify-center rounded-lg bg-white p-5'>
             <span className='text-sm text-gray-400'>현재 최고 입찰가</span>
-            <span className='text-2xl font-bold text-orange-500'>500000원</span>
+            <span className='text-2xl font-bold text-orange-500'>
+              {productDetail.highestBidPrice.toLocaleString()}원
+            </span>
             <span className='text-sm text-gray-400'>
-              시작가:500,000원 | 입찰25회
+              시작가:{productDetail.startingPrice.toLocaleString()}원 | 입찰
+              {productDetail.bidCount}회
             </span>
           </div>
           <div className='flex flex-col gap-2 mt-5'>
@@ -83,12 +94,15 @@ export default function BiddingForm() {
         <div className='flex flex-col gap-4'>
           <div className='flex flex-col gap-4 items-center justify-center rounded-lg bg-white p-5'>
             <span className='text-sm text-gray-400'>현재 최고 입찰가</span>
-            <span className='text-2xl font-bold text-orange-500'>500000원</span>
+            <span className='text-2xl font-bold text-orange-500'>
+              {productDetail.highestBidPrice.toLocaleString()}원
+            </span>
             <span className='text-sm text-gray-400'>
-              시작가:500,000원 | 입찰25회
+              시작가:{productDetail.startingPrice.toLocaleString()}원 | 입찰
+              {productDetail.bidCount}회
             </span>
           </div>
-          <BiddingCancelConfirmModal />
+          <BiddingCancelConfirmModal auctionId={productDetail.auctionId} />
         </div>
       );
     },
@@ -97,15 +111,18 @@ export default function BiddingForm() {
         <div className='flex flex-col gap-4'>
           <div className='flex flex-col gap-4 items-center justify-center rounded-lg bg-white p-5'>
             <span className='text-sm text-gray-400'>현재 최고 입찰가</span>
-            <span className='text-2xl font-bold text-orange-500'>500000원</span>
+            <span className='text-2xl font-bold text-orange-500'>
+              {productDetail.highestBidPrice.toLocaleString()}원
+            </span>
             <span className='text-sm text-gray-400'>
-              시작가:500,000원 | 입찰25회
+              시작가:{productDetail.startingPrice.toLocaleString()}원 | 입찰
+              {productDetail.bidCount}회
             </span>
           </div>
           <div className='flex flex-col gap-4 items-center justify-center rounded-lg bg-white p-5'>
             <span className='text-sm text-gray-400'>즉시 입찰가</span>
             <span className='text-2xl font-bold text-orange-500'>
-              1200000원
+              {productDetail.instantBidPrice.toLocaleString()}원
             </span>
           </div>
           <div className='flex flex-col gap-2 mt-5'>
@@ -143,9 +160,12 @@ export default function BiddingForm() {
         <div className='flex flex-col gap-4'>
           <div className='flex flex-col gap-4 items-center justify-center rounded-lg bg-white p-5'>
             <span className='text-xl text-gray-400'>낙찰 금액</span>
-            <span className='text-3xl font-bold text-orange-500'>500000원</span>
+            <span className='text-3xl font-bold text-orange-500'>
+              {productDetail.highestBidPrice.toLocaleString()}원
+            </span>
             <span className='text-sm text-gray-400'>
-              시작가:500,000원 | 입찰25회
+              시작가:{productDetail.startingPrice.toLocaleString()}원 | 입찰
+              {productDetail.bidCount}회
             </span>
           </div>
           <div className='bg-red-500 text-white flex items-center gap-2 p-4 rounded-lg justify-center'>
@@ -165,7 +185,9 @@ export default function BiddingForm() {
           전자기기
         </Badge>
         <div className='flex w-full justify-between items-center'>
-          <span className='text-2xl font-bold'>제품 타이틀</span>
+          <span className='text-2xl font-bold'>
+            {productDetail.productName}
+          </span>
           <Badge variant={'destructive'}>타이머</Badge>
         </div>
 

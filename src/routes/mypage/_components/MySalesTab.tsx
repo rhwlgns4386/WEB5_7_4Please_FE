@@ -1,38 +1,48 @@
+import { useGetSalesList } from '@/api/sale';
 import CommonSelect from '@/components/common-select';
-import { Badge } from '@/components/ui/badge';
-import MySalesHistoryCard from '@/routes/mypage/_components/mySales/MySalesHistoryCard';
+import { Button } from '@/components/ui/button';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
+import MySalesHistoryCard, {
+  type SalesStatus,
+} from '@/routes/mypage/_components/mySales/MySalesHistoryCard';
+import { usePagination } from '@/hooks/usePagination';
 import { LucideBadgeDollarSign } from 'lucide-react';
+import { useEffect } from 'react';
 
 export default function MySalesTab() {
-  const sortOptions = [
-    {
-      value: 'latest',
-      label: '최신순',
-    },
-    {
-      value: 'oldest',
-      label: '오래된순',
-    },
-  ];
+  const {
+    currentPage,
+    totalPages,
+    setTotalPages,
+    goToPage,
+    nextPage,
+    prevPage,
+    canGoNext,
+    canGoPrev,
+  } = usePagination();
 
-  const searchOptions = [
-    {
-      value: 'five',
-      label: '5개씩 보기',
-    },
-    {
-      value: 'ten',
-      label: '10개씩 보기',
-    },
-    {
-      value: 'fifteen',
-      label: '15개씩 보기',
-    },
-    {
-      value: 'twenty',
-      label: '20개씩 보기',
-    },
-  ];
+  const { data: mySales, isLoading } = useGetSalesList(1, {
+    page: currentPage,
+    size: 5,
+  });
+
+  useEffect(() => {
+    if (mySales?.totalPages) {
+      setTotalPages(mySales.totalPages);
+    }
+  }, [mySales?.totalPages, setTotalPages]);
+
+  if (isLoading) {
+    return <div>로딩 중...</div>;
+  }
 
   return (
     <div className='flex flex-col gap-4'>
@@ -41,30 +51,57 @@ export default function MySalesTab() {
           <LucideBadgeDollarSign className='w-6 h-6' />
           <span className='text-2xl font-bold'>내 판매 내역</span>
         </div>
-        <div className='flex gap-2'>
-          <div></div>
-          <CommonSelect
-            label='정렬 순서'
-            options={sortOptions}
-            defaultValue='latest'
-          />
-          <CommonSelect
-            label='보기 조건'
-            options={searchOptions}
-            defaultValue='five'
-          />
-          <Badge variant={'secondary'}>총 15건</Badge>
+        <div className='flex items-center gap-2'>
+          <span className='text-sm text-gray-400'>
+            총 {mySales?.totalElements ?? 0}건
+          </span>
         </div>
       </div>
       <div className='flex flex-col gap-6'>
-        <MySalesHistoryCard status='OPEN' />
-        <MySalesHistoryCard status='PENDING' />
-        <MySalesHistoryCard status='SUCCESS' />
-        <MySalesHistoryCard status='REJECTED' />
-        <MySalesHistoryCard status='INTRANSIT' />
-        <MySalesHistoryCard status='DELIVERED' />
-        <MySalesHistoryCard status='FAIL' />
+        {mySales?.content?.map(sale => (
+          <MySalesHistoryCard
+            key={sale.auctionId}
+            status={sale.status as SalesStatus}
+            auctionId={sale.auctionId}
+          />
+        ))}
       </div>
+
+      <Pagination>
+        <PaginationContent>
+          <PaginationItem>
+            <Button
+              variant={'ghost'}
+              onClick={prevPage}
+              disabled={!canGoPrev}
+              className='hover:bg-gray-700'
+            >
+              <PaginationPrevious />
+            </Button>
+          </PaginationItem>
+          {Array.from({ length: totalPages }, (_, i) => (
+            <PaginationItem key={i}>
+              <Button
+                variant={currentPage === i ? 'default' : 'ghost'}
+                onClick={() => goToPage(i)}
+                className='hover:bg-gray-700'
+              >
+                <PaginationLink>{i + 1}</PaginationLink>
+              </Button>
+            </PaginationItem>
+          ))}
+          <PaginationItem>
+            <Button
+              variant={'ghost'}
+              onClick={nextPage}
+              disabled={!canGoNext}
+              className='hover:bg-gray-700'
+            >
+              <PaginationNext />
+            </Button>
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
     </div>
   );
 }

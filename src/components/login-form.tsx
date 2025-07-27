@@ -48,7 +48,7 @@ export function LoginForm({
                   <GoogleLogo />
                   구글로 로그인
                 </Button>
-                <Button variant='outline' className='w-full h-12'>
+                <Button variant='outline' className='w-full h-12' type='button'>
                   <KakaoLogo />
                   카카오로 로그인
                 </Button>

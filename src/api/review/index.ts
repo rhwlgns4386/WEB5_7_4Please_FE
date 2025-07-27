@@ -1,5 +1,6 @@
 import { requests } from '@/lib/axiosConfig';
 import type { ReviewList } from '@/types';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { AxiosResponse } from 'axios';
 
 export const getReviews = ({
@@ -9,7 +10,7 @@ export const getReviews = ({
 }: {
   page: number;
   size: number;
-  sort: string[];
+  sort?: string;
 }): Promise<AxiosResponse<ReviewList>> => {
   return requests({
     url: `/api/v1/reviews`,
@@ -38,6 +39,26 @@ export const createReview = ({
       auctionId,
       rating,
       content,
+    },
+  });
+};
+
+// Tanstack Query Hooks
+
+export const useGetReviews = (page: number, size: number, sort?: string) => {
+  return useQuery({
+    queryKey: ['reviews', { page, size, sort }],
+    queryFn: () => getReviews({ page, size, sort }),
+    select: data => data.data,
+  });
+};
+
+export const useCreateReview = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: createReview,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['reviews'] });
     },
   });
 };

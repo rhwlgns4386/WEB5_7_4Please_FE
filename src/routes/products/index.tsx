@@ -13,12 +13,12 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search } from 'lucide-react';
 import ProductCard from '@/routes/(index)/_components/ProductCard';
-import { popularProducts } from '@/routes/(index)/_constants/products';
 import {
   Pagination,
   PaginationContent,
   PaginationItem,
 } from '@/components/ui/pagination';
+import { useGetAuctionList } from '@/api/auction';
 
 type SortType = 'latest' | 'bids' | 'timeout';
 
@@ -34,7 +34,7 @@ export const Route = createFileRoute('/products/')({
     category: (search.category as string) || 'all',
     query: (search.query as string) || '',
     sort: (search.sort as SortType) || 'latest',
-    page: Number(search.page) || 1,
+    page: Number(search.page) || 0,
   }),
   component: Products,
 });
@@ -42,12 +42,12 @@ export const Route = createFileRoute('/products/')({
 // 카테고리 매핑
 const categoryMap = {
   all: '전체',
-  fashion: '패션',
-  electronics: '전자제품',
-  sports: '스포츠',
-  furniture: '가구',
-  household: '생활용품',
-  etc: '기타',
+  '0': '패션',
+  '1': '전자제품',
+  '2': '스포츠',
+  '3': '가구',
+  '4': '생활용품',
+  '5': '기타',
 };
 
 function Products() {
@@ -59,9 +59,21 @@ function Products() {
   const [localQuery, setLocalQuery] = useState(searchParams.query);
   const [localSort, setLocalSort] = useState<SortType>(searchParams.sort);
 
+  const { data: productList } = useGetAuctionList({
+    page: searchParams.page,
+    size: 20,
+    keyword: searchParams.query,
+    categoryId:
+      searchParams.category === 'all'
+        ? undefined
+        : Number(searchParams.category),
+    order: searchParams.sort,
+  });
+
+  console.log(productList);
+
   // URL을 업데이트하는 중앙 함수
   const updateURL = (newSearch: Partial<ProductsSearch>) => {
-    // 검색 조건이 변경되면 항상 1페이지로 리셋
     const shouldResetPage =
       newSearch.category !== undefined ||
       newSearch.query !== undefined ||
@@ -70,7 +82,7 @@ function Products() {
     const updatedSearch = {
       ...searchParams,
       ...newSearch,
-      page: shouldResetPage ? 1 : newSearch.page || searchParams.page,
+      page: shouldResetPage ? 0 : (newSearch.page ?? searchParams.page),
     };
 
     router.navigate({ to: '/products', search: updatedSearch });
@@ -83,40 +95,6 @@ function Products() {
       sort: localSort,
     });
   };
-
-  // 상품 필터링 및 정렬 로직 (임시 데이터 사용)
-  const filteredProducts = popularProducts.filter(product => {
-    const categoryMatch =
-      searchParams.category === 'all' ||
-      (searchParams.category === 'electronics' && product.tag === '전자제품') ||
-      (searchParams.category === 'fashion' && product.tag === '패션') ||
-      (searchParams.category === 'sports' && product.tag === '스포츠') ||
-      (searchParams.category === 'furniture' && product.tag === '가구') ||
-      (searchParams.category === 'household' && product.tag === '생활용품');
-
-    const queryMatch =
-      !searchParams.query ||
-      product.title.toLowerCase().includes(searchParams.query.toLowerCase());
-
-    return categoryMatch && queryMatch;
-  });
-
-  // 정렬 적용
-  const sortedProducts = [...filteredProducts].sort((a, b) => {
-    if (searchParams.sort === 'bids') {
-      return b.bidCount - a.bidCount;
-    }
-    // 'timeout' 정렬 로직 추가 필요 (현재는 latest와 동일)
-    return a.id - b.id; // latest (기본값)
-  });
-
-  // 페이지네이션
-  const itemsPerPage = 20;
-  const totalPages = Math.ceil(sortedProducts.length / itemsPerPage);
-  const paginatedProducts = sortedProducts.slice(
-    (searchParams.page - 1) * itemsPerPage,
-    searchParams.page * itemsPerPage
-  );
 
   return (
     <div className='min-h-screen bg-gray-50 dark:bg-gray-900'>
@@ -133,7 +111,7 @@ function Products() {
             )}
           </h1>
           <p className='text-gray-600 dark:text-gray-400 mt-2'>
-            총 {sortedProducts.length}개의 상품을 찾았습니다
+            총 {productList?.totalElements ?? 0}개의 상품을 찾았습니다
           </p>
         </div>
       </div>
@@ -143,7 +121,10 @@ function Products() {
         <div className='container mx-auto px-4 py-4'>
           <div className='flex flex-col lg:flex-row gap-4 items-start lg:items-center'>
             {/* 카테고리 필터 */}
-            <Select value={localCategory} onValueChange={setLocalCategory}>
+            <Select
+              value={localCategory}
+              onValueChange={value => setLocalCategory(value)}
+            >
               <SelectTrigger className='w-[180px]'>
                 <SelectValue placeholder='카테고리 선택' />
               </SelectTrigger>
@@ -151,20 +132,22 @@ function Products() {
                 <SelectGroup>
                   <SelectLabel>카테고리</SelectLabel>
                   <SelectItem value='all'>전체</SelectItem>
-                  <SelectItem value='fashion'>패션</SelectItem>
-                  <SelectItem value='electronics'>전자제품</SelectItem>
-                  <SelectItem value='sports'>스포츠</SelectItem>
-                  <SelectItem value='furniture'>가구</SelectItem>
-                  <SelectItem value='household'>생활용품</SelectItem>
-                  <SelectItem value='etc'>기타</SelectItem>
+                  <SelectItem value='0'>패션</SelectItem>
+                  <SelectItem value='1'>전자제품</SelectItem>
+                  <SelectItem value='2'>스포츠</SelectItem>
+                  <SelectItem value='3'>가구</SelectItem>
+                  <SelectItem value='4'>생활용품</SelectItem>
+                  <SelectItem value='5'>기타</SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>
 
             {/* 정렬 필터 */}
             <Select
-              value={localSort}
-              onValueChange={(value: string) => setLocalSort(value as SortType)}
+              value={searchParams.sort}
+              onValueChange={(value: string) =>
+                updateURL({ sort: value as SortType })
+              }
             >
               <SelectTrigger className='w-[150px]'>
                 <SelectValue placeholder='정렬 방식' />
@@ -184,8 +167,8 @@ function Products() {
               <div className='relative flex-1'>
                 <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4' />
                 <Input
-                  value={localQuery}
-                  onChange={e => setLocalQuery(e.target.value)}
+                  value={searchParams.query}
+                  onChange={e => updateURL({ query: e.target.value })}
                   onKeyDown={e => e.key === 'Enter' && handleSearch()}
                   placeholder='상품명을 검색해보세요...'
                   className='pl-10'
@@ -204,14 +187,14 @@ function Products() {
 
       {/* 상품 리스트 */}
       <div className='container mx-auto px-4 py-8'>
-        {paginatedProducts.length > 0 ? (
+        {productList?.content && productList.content.length > 0 ? (
           <>
             <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8'>
-              {paginatedProducts.map(product => (
+              {productList.content.map(product => (
                 <Link
                   to={`/products/$id`}
-                  params={{ id: product.id.toString() }}
-                  key={product.id}
+                  params={{ id: product.auctionId.toString() }}
+                  key={product.auctionId}
                 >
                   <ProductCard product={product} theme='dark' />
                 </Link>
@@ -219,33 +202,33 @@ function Products() {
             </div>
 
             {/* 페이지네이션 */}
-            {totalPages > 1 && (
+            {productList.totalPages > 1 && (
               <div className='flex justify-center'>
                 <Pagination>
                   <PaginationContent>
                     <PaginationItem>
                       <button
                         onClick={() =>
-                          searchParams.page > 1 &&
+                          searchParams.page > 0 &&
                           updateURL({ page: searchParams.page - 1 })
                         }
                         className={`inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 gap-1 pl-2.5 ${
-                          searchParams.page <= 1
+                          searchParams.page <= 0
                             ? 'pointer-events-none opacity-50'
                             : 'cursor-pointer'
                         }`}
-                        disabled={searchParams.page <= 1}
+                        disabled={searchParams.page <= 0}
                       >
                         이전
                       </button>
                     </PaginationItem>
 
-                    {[...Array(totalPages)].map((_, i) => (
-                      <PaginationItem key={i + 1}>
+                    {[...Array(productList.totalPages)].map((_, i) => (
+                      <PaginationItem key={i}>
                         <button
-                          onClick={() => updateURL({ page: i + 1 })}
+                          onClick={() => updateURL({ page: i })}
                           className={`inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-10 cursor-pointer ${
-                            searchParams.page === i + 1
+                            searchParams.page === i
                               ? 'bg-primary text-primary-foreground hover:bg-primary/90'
                               : ''
                           }`}
@@ -258,15 +241,17 @@ function Products() {
                     <PaginationItem>
                       <button
                         onClick={() =>
-                          searchParams.page < totalPages &&
+                          searchParams.page < productList.totalPages - 1 &&
                           updateURL({ page: searchParams.page + 1 })
                         }
                         className={`inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 gap-1 pr-2.5 ${
-                          searchParams.page >= totalPages
+                          searchParams.page >= productList.totalPages - 1
                             ? 'pointer-events-none opacity-50'
                             : 'cursor-pointer'
                         }`}
-                        disabled={searchParams.page >= totalPages}
+                        disabled={
+                          searchParams.page >= productList.totalPages - 1
+                        }
                       >
                         다음
                       </button>

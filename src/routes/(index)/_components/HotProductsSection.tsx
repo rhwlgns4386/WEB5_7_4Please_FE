@@ -10,13 +10,19 @@ import { LucideChevronRight } from 'lucide-react';
 import ProductCard from './ProductCard';
 import { useNavigate } from '@tanstack/react-router';
 import useWishlist from '@/routes/(index)/hooks/useWishlist';
-import useProductList from '@/routes/(index)/hooks/useProductList';
 import type { AuctionItem } from '@/types';
+import { useGetAuctionList } from '@/api/auction';
 
 export default function HotProductsSection() {
   const navigate = useNavigate();
   const { registerWishList } = useWishlist();
-  const { data: productsData } = useProductList();
+  const { data: productsData } = useGetAuctionList({
+    page: 0,
+    size: 12,
+    keyword: '',
+    categoryId: undefined,
+    order: 'bids',
+  });
 
   const handleHeartClick = (auctionId: number) => {
     registerWishList({ auctionId });
@@ -53,7 +59,7 @@ export default function HotProductsSection() {
             className='w-full'
           >
             <CarouselContent className='-ml-2 md:-ml-4'>
-              {productsData?.data?.content?.map((product: AuctionItem) => (
+              {productsData?.content.map((product: AuctionItem) => (
                 <CarouselItem
                   key={product.auctionId}
                   className='pl-2 md:pl-4 basis-[280px] sm:basis-[300px] md:basis-[320px] lg:basis-[350px]'

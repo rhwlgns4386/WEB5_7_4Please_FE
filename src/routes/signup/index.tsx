@@ -27,6 +27,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
+import useAuth from '@/hooks/useAuth';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useForm } from 'react-hook-form';
 import z from 'zod';
@@ -34,6 +35,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 
 export const Route = createFileRoute('/signup/')({
   component: RouteComponent,
+  validateSearch: z.object({
+    token: z.string().optional(),
+  }),
   staticData: {
     hideHeader: true,
   },
@@ -41,6 +45,9 @@ export const Route = createFileRoute('/signup/')({
 
 function RouteComponent() {
   const navigate = useNavigate();
+  const { token } = Route.useSearch();
+  const { signupMutation } = useAuth();
+
   const formSchema = z.object({
     nickname: z
       .string()
@@ -59,7 +66,15 @@ function RouteComponent() {
   });
 
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values);
+    if (token) {
+      signupMutation({
+        token,
+        nickName: values.nickname,
+      });
+    } else {
+      // 토큰이 없을 경우의 예외 처리
+      console.error('Signup token is missing.');
+    }
   };
 
   const goToHome = () => {

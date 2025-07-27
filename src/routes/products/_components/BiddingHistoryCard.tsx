@@ -1,16 +1,23 @@
 import { Badge } from '@/components/ui/badge';
+import type { Bid } from '@/types';
 
-export default function BiddingHistoryCard() {
+interface BiddingHistoryCardProps {
+  bid: Bid;
+}
+
+export default function BiddingHistoryCard({ bid }: BiddingHistoryCardProps) {
   return (
     <div className='flex flex-col gap-2'>
       <div className='flex w-full justify-between bg-accent px-6 py-4 rounded-lg'>
         <div className='flex flex-col gap-2 '>
-          <span className='text-sm text-gray-200'>구매자C #3</span>
-          <span className='text-sm text-gray-400'>오전 09:13:22</span>
+          <span className='text-sm text-gray-200'>{bid.bidderName}</span>
+          <span className='text-sm text-gray-400'>{bid.bidTime}</span>
         </div>
         <div className='flex flex-col gap-2'>
           <div className='flex gap-1 items-center'>
-            <span className='text-lg font-bold text-orange-500'>900,000</span>
+            <span className='text-lg font-bold text-orange-500'>
+              {bid.bidPrice.toLocaleString()}
+            </span>
             <span className='text-sm text-gray-200'>원</span>
           </div>
           <div className='flex gap-2'>

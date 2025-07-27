@@ -19,12 +19,16 @@ import useAuth from '@/hooks/useAuth';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import z from 'zod';
+import { Route } from '@/routes/auth/google';
 
 const formSchema = z.object({
   nickName: z.string().min(1),
 });
 
 export default function NicknameForm({ token }: { token: string }) {
+  const { code, state } = Route.useSearch();
+  console.log(code, state);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {

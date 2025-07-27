@@ -2,8 +2,13 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import BiddingHistoryTab from '@/routes/products/_components/BiddingHistoryTab';
 import DescriptionTab from '@/routes/products/_components/DescriptionTab';
 import SellerInfoTab from '@/routes/products/_components/SellerInfoTab';
+import type { ProductDetail } from '@/types';
 
-export default function TabSection() {
+interface TabSectionProps {
+  productDetail: ProductDetail;
+}
+
+export default function TabSection({ productDetail }: TabSectionProps) {
   return (
     <Tabs defaultValue='description'>
       <TabsList className='w-full'>
@@ -13,13 +18,13 @@ export default function TabSection() {
       </TabsList>
       <div className='border border-gray-500 rounded-lg p-4'>
         <TabsContent value='description'>
-          <DescriptionTab />
+          <DescriptionTab description={productDetail.description} />
         </TabsContent>
         <TabsContent value='biddingHistory'>
           <BiddingHistoryTab />
         </TabsContent>
         <TabsContent value='sellerInfo'>
-          <SellerInfoTab />
+          <SellerInfoTab productDetail={productDetail} />
         </TabsContent>
       </div>
     </Tabs>
