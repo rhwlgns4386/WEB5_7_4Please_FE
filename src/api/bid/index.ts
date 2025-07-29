@@ -2,6 +2,7 @@ import { requests } from '@/lib/axiosConfig';
 import type { BidList, Pageable } from '@/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { AxiosResponse } from 'axios';
+import { toast } from 'sonner';
 
 export const createBids = ({
   auctionId,
@@ -69,6 +70,8 @@ export const useDeleteBid = () => {
     mutationFn: deleteBid,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bids'] });
+      queryClient.invalidateQueries({ queryKey: ['auctionDetail'] });
+      toast.success('입찰이 취소되었습니다.');
     },
   });
 };

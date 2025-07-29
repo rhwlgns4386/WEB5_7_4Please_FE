@@ -10,10 +10,12 @@ import {
   DialogTrigger,
   DialogClose,
 } from '@/components/ui/dialog';
+import { useDeleteMember } from '@/api/auth';
 
 export default function DeleteUserConfirmModal() {
   const [inputValue, setInputValue] = useState('');
   const isConfirmationValid = inputValue === '회원탈퇴';
+  const { mutate: deleteMember } = useDeleteMember();
 
   const handleCancel = () => {
     setInputValue('');
@@ -21,8 +23,7 @@ export default function DeleteUserConfirmModal() {
 
   const handleWithdraw = () => {
     if (isConfirmationValid) {
-      // 탈퇴 로직 처리
-      console.log('회원탈퇴 처리');
+      deleteMember();
       setInputValue('');
     }
   };

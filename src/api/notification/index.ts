@@ -1,6 +1,11 @@
 import { requests } from '@/lib/axiosConfig';
 import type { NotificationFive, NotificationList } from '@/types';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  useInfiniteQuery,
+} from '@tanstack/react-query';
 import type { AxiosResponse } from 'axios';
 
 export const createNotification = ({ message }: { message: string }) => {
@@ -49,11 +54,21 @@ export const getNotificationFive = (): Promise<
 
 // Tanstack Query Hooks
 
-export const useGetNotificationList = (page: number, size: number) => {
-  return useQuery({
-    queryKey: ['notifications', { page, size }],
-    queryFn: () => getNotificationList({ page, size }),
-    select: data => data.data,
+export const useGetNotificationList = () => {
+  return useInfiniteQuery({
+    queryKey: ['notifications'],
+    queryFn: ({ pageParam = 0 }) =>
+      getNotificationList({ page: pageParam, size: 10 }),
+    getNextPageParam: lastPage => {
+      const currentPage = lastPage.data.page;
+      const totalPages = lastPage.data.totalPages;
+      return currentPage < totalPages - 1 ? currentPage + 1 : undefined;
+    },
+    initialPageParam: 0,
+    select: data => ({
+      pages: data.pages.flatMap(page => page.data.content),
+      pageParams: data.pageParams,
+    }),
   });
 };
 

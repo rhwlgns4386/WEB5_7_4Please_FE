@@ -1,3 +1,4 @@
+import { useGetMyBidList } from '@/api/my';
 import CommonSelect from '@/components/common-select';
 import { Badge } from '@/components/ui/badge';
 import BiddingHistoryCard from '@/routes/mypage/_components/mybidding/BiddingHistoryCard';
@@ -34,6 +35,13 @@ export default function MyBiddingTab() {
     },
   ];
 
+  const { data: myBidList } = useGetMyBidList({
+    page: 0,
+    size: 10,
+  });
+
+  console.log({ myBidList });
+
   return (
     <div className='flex flex-col gap-4'>
       <div className='flex justify-between items-center w-full border-b border-gray-500 pb-4'>
@@ -53,18 +61,15 @@ export default function MyBiddingTab() {
             options={searchOptions}
             defaultValue='five'
           />
-          <Badge variant={'secondary'}>총 15건</Badge>
+          <Badge variant={'secondary'}>
+            총 {myBidList?.totalElements ?? 0}건
+          </Badge>
         </div>
       </div>
       <div className='flex flex-col gap-6'>
-        <BiddingHistoryCard status='OPEN' />
-        <BiddingHistoryCard status='CLOSE' />
-        <BiddingHistoryCard status='PENDING' />
-        <BiddingHistoryCard status='SUCCESS' />
-        <BiddingHistoryCard status='REJECTED' />
-        <BiddingHistoryCard status='FAIL' />
-        <BiddingHistoryCard status='INTRANSIT' />
-        <BiddingHistoryCard status='DELIVERED' />
+        {myBidList?.content.map(bid => (
+          <BiddingHistoryCard key={bid.bidId} bid={bid} />
+        ))}
       </div>
     </div>
   );

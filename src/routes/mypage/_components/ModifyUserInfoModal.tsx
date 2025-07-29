@@ -11,9 +11,15 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
+import { useUpdateNickname } from '@/api/member';
 
 export default function ModifyUserInfoModal() {
   const [nickname, setNickname] = useState('');
+  const { mutate: updateNickname } = useUpdateNickname();
+
+  const handleClick = () => {
+    updateNickname({ nickName: nickname });
+  };
 
   return (
     <Dialog>
@@ -49,9 +55,7 @@ export default function ModifyUserInfoModal() {
           <Button
             variant={'outline'}
             className='px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white shadow'
-            onClick={() => {
-              /* 저장 로직 */
-            }}
+            onClick={handleClick}
           >
             저장
           </Button>

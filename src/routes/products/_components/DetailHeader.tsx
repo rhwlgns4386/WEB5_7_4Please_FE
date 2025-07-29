@@ -1,11 +1,12 @@
+import { useCreateWishList, useDeleteWishList } from '@/api/wishlist';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from '@tanstack/react-router';
+import { useParams } from '@tanstack/react-router';
 import { LucideArrowLeft, LucideHeart, LucideShare } from 'lucide-react';
 
-export default function DetailHeader() {
-  const navigate = useNavigate();
+export default function DetailHeader({ isWishList }: { isWishList: boolean }) {
+  const { id } = useParams({ from: '/products/$id' });
   const handleGoBack = () => {
-    navigate({ to: '..' });
+    window.history.back();
   };
 
   const handleClickShare = () => {
@@ -16,6 +17,9 @@ export default function DetailHeader() {
     });
   };
 
+  const { mutate: createWishList } = useCreateWishList();
+  const { mutate: deleteWishList } = useDeleteWishList();
+
   return (
     <div className='w-full flex justify-between items-center py-4 px-8 border-b border-gray-200 fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-950'>
       <div className='flex items-center gap-2'>
@@ -25,8 +29,19 @@ export default function DetailHeader() {
         </Button>
       </div>
       <div className='flex items-center gap-2'>
-        <Button variant='outline'>
-          <LucideHeart />
+        <Button
+          variant='outline'
+          onClick={() =>
+            isWishList
+              ? deleteWishList({ auctionId: Number(id) })
+              : createWishList({ auctionId: Number(id) })
+          }
+        >
+          {isWishList ? (
+            <LucideHeart fill='red' stroke='red' />
+          ) : (
+            <LucideHeart />
+          )}
           관심
         </Button>
         <Button variant='outline' onClick={handleClickShare}>

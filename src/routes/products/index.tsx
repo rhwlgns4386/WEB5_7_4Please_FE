@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useRouter } from '@tanstack/react-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Select,
   SelectContent,
@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/pagination';
 import { useGetAuctionList } from '@/api/auction';
 
-type SortType = 'latest' | 'bids' | 'timeout';
+type SortType = 'latest' | 'bids';
 
 type ProductsSearch = {
   category: string;
@@ -42,12 +42,12 @@ export const Route = createFileRoute('/products/')({
 // 카테고리 매핑
 const categoryMap = {
   all: '전체',
-  '0': '패션',
-  '1': '전자제품',
-  '2': '스포츠',
-  '3': '가구',
-  '4': '생활용품',
-  '5': '기타',
+  '1': '패션',
+  '2': '전자제품',
+  '3': '스포츠',
+  '4': '가구',
+  '5': '생활용품',
+  '6': '기타',
 };
 
 function Products() {
@@ -56,8 +56,14 @@ function Products() {
 
   // 필터 UI의 입력 상태를 관리하기 위한 로컬 상태
   const [localCategory, setLocalCategory] = useState(searchParams.category);
-  const [localQuery, _setLocalQuery] = useState(searchParams.query);
-  const [localSort, _setLocalSort] = useState<SortType>(searchParams.sort);
+  const [localQuery, setLocalQuery] = useState(searchParams.query);
+  const [localSort, setLocalSort] = useState<SortType>(searchParams.sort);
+
+  useEffect(() => {
+    setLocalCategory(searchParams.category);
+    setLocalQuery(searchParams.query);
+    setLocalSort(searchParams.sort);
+  }, [searchParams]);
 
   const { data: productList } = useGetAuctionList({
     page: searchParams.page,
@@ -69,8 +75,6 @@ function Products() {
         : Number(searchParams.category),
     order: searchParams.sort,
   });
-
-  console.log(productList);
 
   // URL을 업데이트하는 중앙 함수
   const updateURL = (newSearch: Partial<ProductsSearch>) => {
@@ -132,22 +136,20 @@ function Products() {
                 <SelectGroup>
                   <SelectLabel>카테고리</SelectLabel>
                   <SelectItem value='all'>전체</SelectItem>
-                  <SelectItem value='0'>패션</SelectItem>
-                  <SelectItem value='1'>전자제품</SelectItem>
-                  <SelectItem value='2'>스포츠</SelectItem>
-                  <SelectItem value='3'>가구</SelectItem>
-                  <SelectItem value='4'>생활용품</SelectItem>
-                  <SelectItem value='5'>기타</SelectItem>
+                  <SelectItem value='1'>패션</SelectItem>
+                  <SelectItem value='2'>전자제품</SelectItem>
+                  <SelectItem value='3'>스포츠</SelectItem>
+                  <SelectItem value='4'>가구</SelectItem>
+                  <SelectItem value='5'>생활용품</SelectItem>
+                  <SelectItem value='6'>기타</SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>
 
             {/* 정렬 필터 */}
             <Select
-              value={searchParams.sort}
-              onValueChange={(value: string) =>
-                updateURL({ sort: value as SortType })
-              }
+              value={localSort}
+              onValueChange={(value: string) => setLocalSort(value as SortType)}
             >
               <SelectTrigger className='w-[150px]'>
                 <SelectValue placeholder='정렬 방식' />
@@ -157,7 +159,6 @@ function Products() {
                   <SelectLabel>정렬</SelectLabel>
                   <SelectItem value='latest'>최신순</SelectItem>
                   <SelectItem value='bids'>인기순</SelectItem>
-                  <SelectItem value='timeout'>마감임박순</SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>
@@ -167,8 +168,8 @@ function Products() {
               <div className='relative flex-1'>
                 <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4' />
                 <Input
-                  value={searchParams.query}
-                  onChange={e => updateURL({ query: e.target.value })}
+                  value={localQuery}
+                  onChange={e => setLocalQuery(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && handleSearch()}
                   placeholder='상품명을 검색해보세요...'
                   className='pl-10'

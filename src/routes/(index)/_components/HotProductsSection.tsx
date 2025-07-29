@@ -9,13 +9,13 @@ import {
 import { LucideChevronRight } from 'lucide-react';
 import ProductCard from './ProductCard';
 import { useNavigate } from '@tanstack/react-router';
-import useWishlist from '@/routes/(index)/hooks/useWishlist';
 import type { AuctionItem } from '@/types';
 import { useGetAuctionList } from '@/api/auction';
+import { useCreateWishList } from '@/api/wishlist';
 
 export default function HotProductsSection() {
   const navigate = useNavigate();
-  const { registerWishList } = useWishlist();
+  const { mutate: createWishListMutation } = useCreateWishList();
   const { data: productsData } = useGetAuctionList({
     page: 0,
     size: 12,
@@ -25,13 +25,13 @@ export default function HotProductsSection() {
   });
 
   const handleHeartClick = (auctionId: number) => {
-    registerWishList({ auctionId });
+    createWishListMutation({ auctionId });
   };
 
   const seeAllProducts = () => {
     navigate({
       to: '/products',
-      search: { sort: 'bids', category: 'all', query: '', page: 1 },
+      search: { sort: 'bids', category: 'all', query: '', page: 0 },
     });
   };
 

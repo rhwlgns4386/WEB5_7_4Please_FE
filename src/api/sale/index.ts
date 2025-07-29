@@ -1,28 +1,38 @@
 import { requests } from '@/lib/axiosConfig';
-import type { Pageable, SaleList } from '@/types';
+import type { SaleList } from '@/types';
 import { useQuery } from '@tanstack/react-query';
 import type { AxiosResponse } from 'axios';
 
 export const getSalesList = ({
   sellerId,
-  pageable,
+  page,
+  size,
 }: {
   sellerId: number;
-  pageable: Pageable;
+  page: number;
+  size: number;
 }): Promise<AxiosResponse<SaleList>> => {
   return requests({
     url: `/api/v1/sales/${sellerId}`,
     method: 'GET',
-    params: pageable,
+    params: { page, size },
   });
 };
 
 // Tanstack Query Hooks
 
-export const useGetSalesList = (sellerId: number, pageable: Pageable) => {
+export const useGetSalesList = ({
+  sellerId,
+  page,
+  size,
+}: {
+  sellerId: number;
+  page: number;
+  size: number;
+}) => {
   return useQuery({
-    queryKey: ['sales', sellerId, pageable],
-    queryFn: () => getSalesList({ sellerId, pageable }),
+    queryKey: ['sales', sellerId, page, size],
+    queryFn: () => getSalesList({ sellerId, page, size }),
     enabled: !!sellerId,
     select: data => data.data,
   });

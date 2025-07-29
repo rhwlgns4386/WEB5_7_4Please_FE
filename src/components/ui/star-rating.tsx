@@ -28,34 +28,21 @@ export function StarRating({
   };
 
   const starSize = sizeClasses[size];
+  const displayRating = hoverRating ?? value;
 
-  const handleMouseEnter = (starIndex: number, isHalf: boolean) => {
+  const handleClick = (ratingValue: number) => {
+    if (readonly || !onChange) return;
+    onChange(ratingValue);
+  };
+
+  const handleMouseEnter = (ratingValue: number) => {
     if (readonly) return;
-    const rating = starIndex + (isHalf ? 0.5 : 1);
-    setHoverRating(rating);
+    setHoverRating(ratingValue);
   };
 
   const handleMouseLeave = () => {
     if (readonly) return;
     setHoverRating(null);
-  };
-
-  const handleClick = (starIndex: number, isHalf: boolean) => {
-    if (readonly || !onChange) return;
-    const rating = starIndex + (isHalf ? 0.5 : 1);
-    onChange(rating);
-  };
-
-  const getStarFillType = (starIndex: number): 'empty' | 'half' | 'full' => {
-    const currentRating = hoverRating !== null ? hoverRating : value;
-
-    if (currentRating >= starIndex + 1) {
-      return 'full';
-    } else if (currentRating >= starIndex + 0.5) {
-      return 'half';
-    } else {
-      return 'empty';
-    }
   };
 
   return (
@@ -64,61 +51,22 @@ export function StarRating({
       onMouseLeave={handleMouseLeave}
     >
       {Array.from({ length: maxRating }, (_, starIndex) => {
-        const fillType = getStarFillType(starIndex);
+        const ratingValue = starIndex + 1;
+        const isFilled = ratingValue <= displayRating;
 
         return (
-          <div
+          <LucideStar
             key={starIndex}
-            className={cn('relative', !readonly && 'cursor-pointer', starSize)}
-          >
-            {/* 빈 별 (배경) */}
-            <LucideStar
-              className={cn('absolute inset-0 text-gray-300', starSize)}
-              fill='transparent'
-              stroke='currentColor'
-            />
-
-            {/* 반 별 (왼쪽 절반) */}
-            {fillType === 'half' && (
-              <div
-                className={cn('absolute inset-0 overflow-hidden', starSize)}
-                style={{ clipPath: 'inset(0 50% 0 0)' }}
-              >
-                <LucideStar
-                  className={cn('text-yellow-400', starSize)}
-                  fill='currentColor'
-                  stroke='currentColor'
-                />
-              </div>
+            className={cn(
+              starSize,
+              !readonly && 'cursor-pointer',
+              isFilled ? 'text-yellow-400' : 'text-gray-300'
             )}
-
-            {/* 전체 별 */}
-            {fillType === 'full' && (
-              <LucideStar
-                className={cn('absolute inset-0 text-yellow-400', starSize)}
-                fill='currentColor'
-                stroke='currentColor'
-              />
-            )}
-
-            {/* 호버 영역 - 왼쪽 절반 (0.5점) */}
-            {!readonly && (
-              <div
-                className='absolute inset-0 w-1/2 z-10'
-                onMouseEnter={() => handleMouseEnter(starIndex, true)}
-                onClick={() => handleClick(starIndex, true)}
-              />
-            )}
-
-            {/* 호버 영역 - 오른쪽 절반 (1점) */}
-            {!readonly && (
-              <div
-                className='absolute inset-0 left-1/2 w-1/2 z-10'
-                onMouseEnter={() => handleMouseEnter(starIndex, false)}
-                onClick={() => handleClick(starIndex, false)}
-              />
-            )}
-          </div>
+            fill={isFilled ? 'currentColor' : 'transparent'}
+            stroke='currentColor'
+            onMouseEnter={() => handleMouseEnter(ratingValue)}
+            onClick={() => handleClick(ratingValue)}
+          />
         );
       })}
     </div>

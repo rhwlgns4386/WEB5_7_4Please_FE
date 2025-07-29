@@ -1,24 +1,18 @@
+import { useUpdateShipment } from '@/api/shipment';
 import PaymentModal from '@/components/payment-modal';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { SellerReviewModal } from '@/routes/mypage/_components/SellerReviewModal';
+import type { MyBid } from '@/types';
 import { LucideAlertCircle, LucideTruck } from 'lucide-react';
 
-export type BiddingStatus =
-  | 'OPEN'
-  | 'CLOSE'
-  | 'FAIL'
-  | 'PENDING'
-  | 'SUCCESS'
-  | 'REJECTED'
-  | 'INTRANSIT'
-  | 'DELIVERED';
-
 interface Props {
-  status: BiddingStatus;
+  bid: MyBid;
 }
 
-export default function BiddingHistoryCard({ status }: Props) {
+export default function BiddingHistoryCard({ bid }: Props) {
+  const { mutate: updateShipment } = useUpdateShipment();
+
   const bottomContentByStatusMapping = {
     OPEN: () => <></>,
     CLOSE: () => (
@@ -75,7 +69,12 @@ export default function BiddingHistoryCard({ status }: Props) {
           운송장 번호: 12312312
         </span>
         <div className='flex gap-2'>
-          <Button variant={'outline'}>구매 확정</Button>
+          <Button
+            variant={'outline'}
+            onClick={() => updateShipment({ auctionId: bid.auctionId })}
+          >
+            구매 확정
+          </Button>
           <Button variant={'outline'}>반품 요청</Button>
         </div>
       </div>
@@ -134,23 +133,24 @@ export default function BiddingHistoryCard({ status }: Props) {
     <div className='bg-gray-800/50 rounded-lg px-4 py-3'>
       <div className='flex gap-4 items-center '>
         <div className='w-[100px] h-[100px] rounded-lg overflow-hidden shrink-0'>
-          <img
-            src={'https://picsum.photos/200/300'}
-            alt='bidding-history-image'
-          />
+          <img src={bid.thumbnailUrl} alt='bidding-history-image' />
         </div>
         <div className='w-full flex flex-col gap-2 '>
           <div className='flex justify-between items-center w-full'>
             <div className='flex gap-2 items-center'>
-              <span className='text-lg font-bold'>아이폰 16 프로 맥스</span>
-              <span className='text-sm text-gray-500'>판매자: wecaners</span>
+              <span className='text-lg font-bold'>{bid.product}</span>
+              <span className='text-sm text-gray-500'>
+                판매자: {bid.sellerNickName}
+              </span>
             </div>
-            {badgeByStatusMapping[status]()}
+            {badgeByStatusMapping[bid.status]()}
           </div>
           <div className='flex gap-6'>
             <div className='flex gap-2 flex-col bg-gray-600/50 rounded-lg p-2 min-w-[250px] flex-1'>
               <span className='text-sm text-gray-500'>현재 최고가</span>
-              <span className='text-lg font-bold'>100,000원</span>
+              <span className='text-lg font-bold'>
+                {bid.highestBidPrice.toLocaleString()}원
+              </span>
             </div>
             <div
               className={`flex gap-2 flex-col rounded-lg p-2 min-w-[250px] flex-1 ${
@@ -158,12 +158,14 @@ export default function BiddingHistoryCard({ status }: Props) {
               }`}
             >
               <span className='text-sm text-white'>내 입찰가</span>
-              <span className='text-lg font-bold'>100,000원</span>
+              <span className='text-lg font-bold'>
+                {bid.myBidPrice.toLocaleString()}원
+              </span>
             </div>
           </div>
         </div>
       </div>
-      {bottomContentByStatusMapping[status]()}
+      {bottomContentByStatusMapping[bid.status]()}
     </div>
   );
 }

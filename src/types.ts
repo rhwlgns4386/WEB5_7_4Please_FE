@@ -14,9 +14,22 @@ export interface CreateAuctionRequest {
   buyNowPrice: number;
 }
 
+export interface S3UploadResponse {
+  imageUrls: string[];
+}
+
 export interface Category {
   categoryId: number;
   name: string;
+}
+
+export interface SellerInfo {
+  sellerId: number;
+  sellerNickname: string;
+  totalReviews: number;
+  averageRating: number;
+  completedDeals: number;
+  createdAt: string;
 }
 
 export interface AuctionItem {
@@ -29,6 +42,70 @@ export interface AuctionItem {
   bidCount: number;
   endTime: string;
   isWishlist: boolean;
+}
+
+export interface MemberInfo {
+  totalReviews: number;
+  averageRating: number;
+  nickname: string;
+}
+
+export interface MyAuction {
+  auctionId: number;
+  thumbnailUrl: string;
+  category: {
+    categoryId: number;
+    name: string;
+  };
+  name: string;
+  instantPrice: number;
+  endTime: string;
+  maxPrice: number;
+  bidCount: number;
+  bidId: number;
+  bidderName: string;
+  paymentDeadline: string;
+  createdAt: string;
+  status: BiddingStatus;
+}
+export interface MyAuctionList {
+  content: MyAuction[];
+  page: number;
+  size: number;
+  totalPages: number;
+  totalElements: number;
+}
+
+export type BiddingStatus =
+  | 'OPEN'
+  | 'CLOSE'
+  | 'FAIL'
+  | 'PENDING'
+  | 'SUCCESS'
+  | 'REJECTED'
+  | 'INTRANSIT'
+  | 'DELIVERED';
+
+export interface MyBid {
+  auctionId: number;
+  bidId: number;
+  thumbnailUrl: string;
+  product: string;
+  status: BiddingStatus;
+  startBidPrice: number;
+  highestBidPrice: number;
+  instantBidPrice: number;
+  myBidPrice: number;
+  bidTime: string;
+  paymentDeadline: string;
+  sellerNickName: string;
+}
+export interface MyBidList {
+  content: MyBid[];
+  page: number;
+  size: number;
+  totalPages: number;
+  totalElements: number;
 }
 
 export interface AuctionList {
@@ -115,18 +192,21 @@ export interface ProductDetail {
   endTime: string;
   thumbnailUrl: string;
   imageUrls: string[];
+  isWishList: boolean;
+}
+
+export interface WishListContent {
+  wishlistId: number;
+  auctionId: number;
+  thumbnailUrl: string;
+  name: string;
+  maxPrice: number;
+  bidCount: number;
+  createdAt: string;
 }
 
 export interface WishList {
-  content: {
-    wishlistId: number;
-    auctionId: number;
-    thumbnailUrl: string;
-    name: string;
-    maxPrice: number;
-    bidCount: number;
-    createdAt: string;
-  }[];
+  content: WishListContent[];
   page: number;
   size: number;
   totalPages: number;
@@ -157,7 +237,10 @@ export interface NotificationList {
     notificationId: number;
     message: string;
     createdAt: string;
+    isRead: boolean;
   }[];
+  page: number;
+  totalPages: number;
 }
 
 export interface NotificationFive {

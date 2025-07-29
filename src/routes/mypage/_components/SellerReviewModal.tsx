@@ -23,6 +23,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import { useCreateReview } from '@/api/review';
 
 const reviewSchema = z.object({
   rating: z
@@ -49,11 +50,15 @@ export function SellerReviewModal() {
     },
   });
 
-  const handleSubmit = (data: ReviewFormData) => {
-    console.log('리뷰 데이터:', data);
-    // 여기에 백엔드 API 호출 로직 추가
+  const { mutate: createReview } = useCreateReview();
 
-    // 성공 시 모달 닫기
+  const handleSubmit = (data: ReviewFormData) => {
+    createReview({
+      auctionId: 7,
+      rating: data.rating,
+      content: data.review || '',
+    });
+
     setIsOpen(false);
     form.reset();
   };

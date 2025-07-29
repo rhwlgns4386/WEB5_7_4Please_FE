@@ -38,7 +38,7 @@ export const signin = ({
 export const updateNickname = ({ nickName }: { nickName: string }) => {
   return requests({
     url: `/api/v1/members`,
-    method: 'PUT',
+    method: 'PATCH',
     data: nickName,
   });
 };
@@ -99,10 +99,16 @@ export const useSignin = () => {
 
 export const useUpdateNickname = () => {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   return useMutation({
     mutationFn: updateNickname,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['member'] });
+      toast.success('닉네임이 변경되었습니다.');
+      navigate({ to: '/mypage' });
+    },
+    onError: error => {
+      toast.error(error.message);
     },
   });
 };

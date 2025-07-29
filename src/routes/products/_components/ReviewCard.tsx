@@ -1,22 +1,25 @@
+import type { ReviewItem } from '@/types';
 import { LucideStar } from 'lucide-react';
 
-export default function ReviewCard() {
+export default function ReviewCard({ review }: { review: ReviewItem }) {
   return (
     <div className='flex justify-between items-center bg-accent p-4 rounded-lg'>
       <div className='flex gap-4 items-center'>
-        <span className='text-lg font-bold'>김구매</span>
+        <span className='text-lg font-bold'>{review.nickName}</span>
         <div className='flex gap-2 flex-col'>
           <div className='flex gap-1'>
-            <LucideStar className='text-amber-300 fill-amber-300' size={20} />
-            <LucideStar className='text-amber-300 fill-amber-300' size={20} />
-            <LucideStar className='text-amber-300 fill-amber-300' size={20} />
-            <LucideStar className='text-amber-300 fill-amber-300' size={20} />
-            <LucideStar className='text-amber-300 fill-amber-300' size={20} />
+            {Array.from({ length: review.rating }).map((_, index) => (
+              <LucideStar
+                key={index}
+                className='text-amber-300 fill-amber-300'
+                size={20}
+              />
+            ))}
           </div>
-          <span>배송도 빠르고, 상품도 정확합니다.</span>
+          <span>{review.content}</span>
         </div>
       </div>
-      <span>2025-07-09</span>
+      <span>{review.reviewTime}</span>
     </div>
   );
 }

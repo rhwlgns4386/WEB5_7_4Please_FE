@@ -112,12 +112,12 @@ export default function Hero() {
                   <SelectGroup>
                     <SelectLabel>카테고리</SelectLabel>
                     <SelectItem value='all'>전체</SelectItem>
-                    <SelectItem value='0'>패션</SelectItem>
-                    <SelectItem value='1'>전자제품</SelectItem>
-                    <SelectItem value='2'>스포츠</SelectItem>
-                    <SelectItem value='3'>가구</SelectItem>
-                    <SelectItem value='4'>생활용품</SelectItem>
-                    <SelectItem value='5'>기타</SelectItem>
+                    <SelectItem value='1'>패션</SelectItem>
+                    <SelectItem value='2'>전자제품</SelectItem>
+                    <SelectItem value='3'>스포츠</SelectItem>
+                    <SelectItem value='4'>가구</SelectItem>
+                    <SelectItem value='5'>생활용품</SelectItem>
+                    <SelectItem value='6'>기타</SelectItem>
                   </SelectGroup>
                 </SelectContent>
               </Select>

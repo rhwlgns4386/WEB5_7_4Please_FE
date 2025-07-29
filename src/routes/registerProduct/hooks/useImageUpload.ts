@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -6,6 +6,7 @@ import { useMutation } from '@tanstack/react-query';
 import { postAuction } from '@/api/auction';
 import { toast } from 'sonner';
 import useS3Upload from '@/hooks/useS3Upload';
+import { useNavigate } from '@tanstack/react-router';
 
 export default function useImageUpload() {
   const thumbnailRef = useRef<HTMLInputElement>(null);
@@ -13,16 +14,41 @@ export default function useImageUpload() {
 
   const [thumbnail, setThumbnail] = useState<File | null>(null);
   const [productImages, setProductImages] = useState<File[]>([]);
+
   const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
   const [productImagesUrl, setProductImagesUrl] = useState<string[]>([]);
 
+  const [finalThumbnailUrl, setFinalThumbnailUrl] = useState<string | null>(
+    null
+  );
+  const [finalProductImagesUrl, setFinalProductImagesUrl] = useState<string[]>(
+    []
+  );
+
+  const [uploadCount, setUploadCount] = useState(0);
+  const isUploading = uploadCount > 0;
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    return () => {
+      if (thumbnailUrl) {
+        URL.revokeObjectURL(thumbnailUrl);
+      }
+      productImagesUrl.forEach(url => URL.revokeObjectURL(url));
+    };
+  }, [productImagesUrl, thumbnailUrl]);
+
   const { mutate: createAuction } = useMutation({
     mutationFn: postAuction,
-    onSuccess: () => toast('성공적으로 등록되었습니다.'),
+    onSuccess: () => {
+      toast('성공적으로 등록되었습니다.');
+      navigate({ to: '/' });
+    },
     onError: () => toast('등록에 실패했습니다.'),
   });
 
-  const { uploadFileMutation } = useS3Upload();
+  const { mutate: uploadFileMutation } = useS3Upload();
 
   const formSchema = z
     .object({
@@ -107,15 +133,25 @@ export default function useImageUpload() {
   const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      const objectUrl = URL.createObjectURL(file);
+      setThumbnailUrl(objectUrl);
       setThumbnail(file);
-      const blob = new Blob([JSON.stringify(file)], {
-        type: 'application/json',
-      });
+
       const formData = new FormData();
-      formData.append('image', blob);
+      formData.append('image', file);
+      setUploadCount(prev => prev + 1);
       uploadFileMutation(formData, {
-        onSuccess: (data: any) => {
-          setThumbnailUrl(data.data[0]);
+        onSuccess: data => {
+          setFinalThumbnailUrl(data.data?.imageUrls[0]);
+        },
+        onError: () => {
+          toast.error('썸네일 업로드에 실패했습니다.');
+          URL.revokeObjectURL(objectUrl);
+          setThumbnailUrl(null);
+          setThumbnail(null);
+        },
+        onSettled: () => {
+          setUploadCount(prev => prev - 1);
         },
       });
     }
@@ -125,39 +161,63 @@ export default function useImageUpload() {
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
     const files = e.target.files;
-    if (files) {
-      setProductImages(Array.from(files));
+    if (files && files.length > 0) {
+      const newFiles = Array.from(files);
+      const newObjectUrls = newFiles.map(f => URL.createObjectURL(f));
+
+      setProductImages(prev => [...prev, ...newFiles]);
+      setProductImagesUrl(prev => [...prev, ...newObjectUrls]);
+
       const formData = new FormData();
-      Array.from(files).forEach(file => {
+      newFiles.forEach(file => {
         formData.append('image', file);
       });
+      setUploadCount(prev => prev + 1);
       uploadFileMutation(formData, {
-        onSuccess: (data: any) => {
-          setProductImagesUrl(data.data);
+        onSuccess: data => {
+          setFinalProductImagesUrl(prev => [...prev, ...data.data?.imageUrls]);
+        },
+        onError: () => {
+          toast.error('이미지 업로드에 실패했습니다. 다시 시도해주세요.');
+          setProductImagesUrl(prev =>
+            prev.filter(url => !newObjectUrls.includes(url))
+          );
+          newObjectUrls.forEach(url => URL.revokeObjectURL(url));
+        },
+        onSettled: () => {
+          setUploadCount(prev => prev - 1);
         },
       });
     }
   };
 
   const handleThumbnailRemove = () => {
+    if (thumbnailUrl) {
+      URL.revokeObjectURL(thumbnailUrl);
+    }
     setThumbnail(null);
     setThumbnailUrl(null);
+    setFinalThumbnailUrl(null);
     if (thumbnailRef.current) {
       thumbnailRef.current.value = '';
     }
   };
 
   const handleProductImagesRemove = (index: number) => {
+    const urlToRemove = productImagesUrl[index];
+    URL.revokeObjectURL(urlToRemove);
+
     setProductImagesUrl(prev => prev.filter((_, i) => i !== index));
     setProductImages(prev => prev.filter((_, i) => i !== index));
+    setFinalProductImagesUrl(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleFormSubmit = (data: z.infer<typeof formSchema>) => {
-    if (!thumbnailUrl) {
+    if (!finalThumbnailUrl) {
       toast.error('썸네일 이미지를 등록해주세요.');
       return;
     }
-    if (productImagesUrl.length === 0) {
+    if (finalProductImagesUrl.length === 0) {
       toast.error('상품 이미지를 1개 이상 등록해주세요.');
       return;
     }
@@ -166,8 +226,8 @@ export default function useImageUpload() {
       data: {
         productName: data.productName,
         description: data.description,
-        thumbnailUrl: thumbnailUrl,
-        imageUrls: productImagesUrl,
+        thumbnailUrl: finalThumbnailUrl,
+        imageUrls: finalProductImagesUrl,
         categoryId: Number(data.categoryId),
         address: data.address,
         addressDetail: data.addressDetail,
@@ -197,5 +257,6 @@ export default function useImageUpload() {
 
     form,
     handleFormSubmit,
+    isUploading,
   };
 }

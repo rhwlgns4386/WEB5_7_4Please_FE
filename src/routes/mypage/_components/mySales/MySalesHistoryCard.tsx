@@ -1,3 +1,5 @@
+import { useCreateSettlement } from '@/api/settlement';
+import { useCreateShipment } from '@/api/shipment';
 import BiddingCancelConfirmModal from '@/components/bidding-cancel-confirm-modal';
 import {
   Accordion,
@@ -7,7 +9,8 @@ import {
 } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import type { SaleContent } from '@/types';
+import { usePaymentCountdown } from '@/hooks/usePaymentCountdown';
+import type { MyAuction } from '@/types';
 import { LucideTimer, LucideCrown, LucideSend } from 'lucide-react';
 
 export type SalesStatus =
@@ -22,10 +25,19 @@ export type SalesStatus =
 interface Props {
   status: SalesStatus;
   auctionId: number;
-  salesData: SaleContent;
+  salesData: MyAuction;
 }
 
-export default function MySalesHistoryCard({ status, auctionId }: Props) {
+export default function MySalesHistoryCard({
+  status,
+  auctionId,
+  salesData,
+}: Props) {
+  const { mutate: createSettlement } = useCreateSettlement();
+  const timeLeft = usePaymentCountdown(salesData.endTime);
+
+  const { mutate: createShipment } = useCreateShipment();
+
   const bottomContentByStatusMapping = {
     OPEN: () => (
       <div className='flex justify-end mt-4 w-full'>
@@ -38,15 +50,17 @@ export default function MySalesHistoryCard({ status, auctionId }: Props) {
         <div className='flex flex-col gap-2'>
           <div className='flex gap-2 items-center'>
             <span className='text-sm text-white'>낙찰자:</span>
-            <span className='text-sm text-white'>wecaners</span>
+            <span className='text-sm text-white'>{salesData.bidderName}</span>
           </div>
           <div className='flex gap-2 items-center'>
             <span className='text-sm text-white'>결제마감일:</span>
-            <span className='text-sm text-white'>2025-01-01</span>
+            <span className='text-sm text-white'>
+              {salesData.paymentDeadline}
+            </span>
           </div>
           <div className='flex gap-2 items-center'>
             <span className='text-sm text-orange-500'>남은 시간:</span>
-            <span className='text-sm text-orange-500'>18시간 30분</span>
+            <span className='text-sm text-orange-500'>{timeLeft}</span>
           </div>
           <span className='text-sm text-gray-500'>
             낙찰자가 24시간 내에 결제하지 않으먼 차상위 입찰지이게 기회가
@@ -62,15 +76,17 @@ export default function MySalesHistoryCard({ status, auctionId }: Props) {
         <div className='flex flex-col gap-2 w-full'>
           <div className='flex gap-2 items-center'>
             <span className='text-sm text-white'>차상위 입찰자:</span>
-            <span className='text-sm text-white'>wecaners</span>
+            <span className='text-sm text-white'>{salesData.bidderName}</span>
           </div>
           <div className='flex gap-2 items-center'>
             <span className='text-sm text-white'>차상위 입찰 결제 마감:</span>
-            <span className='text-sm text-white'>2025-01-01</span>
+            <span className='text-sm text-white'>
+              {salesData.paymentDeadline}
+            </span>
           </div>
           <div className='flex gap-2 items-center'>
             <span className='text-sm text-orange-500'>남은 시간:</span>
-            <span className='text-sm text-orange-500'>18시간 30분</span>
+            <span className='text-sm text-orange-500'>{timeLeft}</span>
           </div>
 
           <div className='flex items-center justify-between w-full'>
@@ -78,7 +94,10 @@ export default function MySalesHistoryCard({ status, auctionId }: Props) {
               낙찰자가 24시간 내에 결제하지 않으먼 차상위 입찰지이게 기회가
               제공됩니다.
             </span>
-            <Button variant={'outline'}>
+            <Button
+              variant={'outline'}
+              onClick={() => createSettlement({ auctionId })}
+            >
               <LucideSend /> 차상위 입찰자에게 알림 보내기
             </Button>
           </div>
@@ -94,7 +113,12 @@ export default function MySalesHistoryCard({ status, auctionId }: Props) {
             placeholder='운송장 번호를 입력해주세요.'
             className='rounded-lg p-2 bg-gray-600/50 w-[350px]'
           />
-          <Button variant={'outline'}>운송장 번호 입력</Button>
+          <Button
+            variant={'outline'}
+            onClick={() => createShipment({ auctionId })}
+          >
+            운송장 번호 입력
+          </Button>
         </div>
         <Accordion type='single' collapsible>
           <AccordionItem value='item-1'>

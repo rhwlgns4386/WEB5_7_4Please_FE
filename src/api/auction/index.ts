@@ -1,7 +1,15 @@
 import { requests } from '@/lib/axiosConfig';
-import type { AuctionList, CreateAuctionRequest, ProductDetail } from '@/types';
+import type {
+  AuctionList,
+  CreateAuctionRequest,
+  ProductDetail,
+  S3UploadResponse,
+  SellerInfo,
+} from '@/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from '@tanstack/react-router';
 import type { AxiosResponse } from 'axios';
+import { toast } from 'sonner';
 
 export const postAuction = ({ data }: { data: CreateAuctionRequest }) => {
   return requests({
@@ -31,7 +39,9 @@ export const getAuctionList = ({
   });
 };
 
-export const s3Upload = (formData: FormData) => {
+export const s3Upload = (
+  formData: FormData
+): Promise<AxiosResponse<S3UploadResponse>> => {
   return requests({
     url: '/api/v1/auctions/images',
     method: 'POST',
@@ -60,7 +70,27 @@ export const deleteAuction = ({ auctionId }: { auctionId: number }) => {
   });
 };
 
+export const getSellerInfo = ({
+  auctionId,
+}: {
+  auctionId: number;
+}): Promise<AxiosResponse<SellerInfo>> => {
+  return requests({
+    url: `/api/v1/auctions/${auctionId}/seller`,
+    method: 'GET',
+  });
+};
+
 // Tanstack Query Hooks
+
+export const useGetSellerInfo = ({ auctionId }: { auctionId: number }) => {
+  return useQuery({
+    queryKey: ['sellerInfo', auctionId],
+    queryFn: () => getSellerInfo({ auctionId }),
+    enabled: !!auctionId,
+    select: data => data.data,
+  });
+};
 
 export const useGetAuctionList = ({
   page,
@@ -108,10 +138,13 @@ export const useS3Upload = () => {
 };
 
 export const useDeleteAuction = () => {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: deleteAuction,
     onSuccess: (_, { auctionId }) => {
+      toast.success('경매가 취소되었습니다.');
+      navigate({ to: '..' });
       queryClient.invalidateQueries({ queryKey: ['auctions'] });
       queryClient.invalidateQueries({ queryKey: ['auctionDetail', auctionId] });
     },

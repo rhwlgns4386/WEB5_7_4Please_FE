@@ -1,3 +1,4 @@
+import { useDeleteBid } from '@/api/bid';
 import { Badge } from '@/components/ui/badge';
 import type { Bid } from '@/types';
 
@@ -6,6 +7,8 @@ interface BiddingHistoryCardProps {
 }
 
 export default function BiddingHistoryCard({ bid }: BiddingHistoryCardProps) {
+  const { mutate: deleteBid } = useDeleteBid();
+
   return (
     <div className='flex flex-col gap-2'>
       <div className='flex w-full justify-between bg-accent px-6 py-4 rounded-lg'>
@@ -35,7 +38,8 @@ export default function BiddingHistoryCard({ bid }: BiddingHistoryCardProps) {
             </Badge>
             <Badge
               variant={'destructive'}
-              className='border border-foreground/50'
+              className='border border-foreground/50 cursor-pointer'
+              onClick={() => deleteBid({ bidId: bid.bidId })}
             >
               취소
             </Badge>

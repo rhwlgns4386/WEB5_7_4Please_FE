@@ -8,13 +8,14 @@ import { useUserStore } from '@/store/user';
 
 export const refreshToken = () => {
   return requests({
-    url: `/api/v1/auth/refresh/token`,
+    url: `/api/v1/auth/reissue/token`,
     method: 'POST',
   });
 };
 
 export const logout = () => {
   // cookie로 refreshtoken을 파라미터로 전달해야함.
+
   return requests({
     url: `/api/v1/auth/logout`,
     method: 'POST',
@@ -57,21 +58,29 @@ export const useRefreshToken = () => {
 };
 
 export const useLogout = () => {
+  const { clearUser } = useUserStore();
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: logout,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['member'] });
+      clearUser();
     },
   });
 };
 
 export const useDeleteMember = () => {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   return useMutation({
     mutationFn: deleteMember,
     onSuccess: () => {
+      toast.success('회원탈퇴가 완료되었습니다.');
+      navigate({ to: '/login' });
       queryClient.invalidateQueries(); // 모든 쿼리 무효화
+    },
+    onError: (error: AxiosError) => {
+      toast.error(error.message);
     },
   });
 };
@@ -100,11 +109,10 @@ export const useSocialLogin = () => {
             token: error.response.data.token,
           },
         });
-      } else {
-        // 기타 에러 처리
-        toast.error('로그인 중 오류가 발생했습니다.');
-        navigate({ to: '/login' });
+        return;
       }
+      toast.error('로그인 중 오류가 발생했습니다.');
+      navigate({ to: '/login' });
     },
   });
 };

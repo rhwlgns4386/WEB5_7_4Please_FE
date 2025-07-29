@@ -18,10 +18,10 @@ function RouteComponent() {
 
   return (
     <div className='bg-gray-800/50 p-10'>
-      <DetailHeader />
+      <DetailHeader isWishList={productDetail?.isWishList ?? false} />
       <div className='flex gap-10 mt-[69px] '>
         <div className='flex flex-col flex-2 gap-5'>
-          <ImageLibrary />
+          <ImageLibrary images={productDetail?.imageUrls || []} />
           {productDetail && <TabSection productDetail={productDetail} />}
         </div>
         <div className='flex-1'>

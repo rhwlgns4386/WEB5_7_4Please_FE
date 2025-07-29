@@ -13,6 +13,7 @@ interface CommonSelectProps {
   label: string;
   options: { value: string; label: string }[];
   defaultValue: string;
+  onValueChange?: (value: string) => void;
 }
 
 export default function CommonSelect({
@@ -20,9 +21,10 @@ export default function CommonSelect({
   label,
   options,
   defaultValue,
+  onValueChange,
 }: CommonSelectProps) {
   return (
-    <Select defaultValue={defaultValue}>
+    <Select defaultValue={defaultValue} onValueChange={onValueChange}>
       <SelectTrigger className='w-[180px]'>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>

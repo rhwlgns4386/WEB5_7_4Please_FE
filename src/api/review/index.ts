@@ -1,9 +1,13 @@
 import { requests } from '@/lib/axiosConfig';
 import type { ReviewList } from '@/types';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import type { AxiosResponse } from 'axios';
+import {
+  useMutation,
+  useQueryClient,
+  useInfiniteQuery,
+} from '@tanstack/react-query';
 
-export const getReviews = ({
+export const getReviews = async ({
+  memberId,
   page,
   size,
   sort,
@@ -11,9 +15,10 @@ export const getReviews = ({
   page: number;
   size: number;
   sort?: string;
-}): Promise<AxiosResponse<ReviewList>> => {
-  return requests({
-    url: `/api/v1/reviews`,
+  memberId: number;
+}): Promise<ReviewList> => {
+  const response = await requests({
+    url: `/api/v1/reviews/${memberId}`,
     method: 'GET',
     params: {
       page,
@@ -21,6 +26,7 @@ export const getReviews = ({
       sort,
     },
   });
+  return response.data;
 };
 
 export const createReview = ({
@@ -45,11 +51,28 @@ export const createReview = ({
 
 // Tanstack Query Hooks
 
-export const useGetReviews = (page: number, size: number, sort?: string) => {
-  return useQuery({
-    queryKey: ['reviews', { page, size, sort }],
-    queryFn: () => getReviews({ page, size, sort }),
-    select: data => data.data,
+export const useGetReviews = ({
+  memberId,
+  enabled,
+}: {
+  memberId: number;
+  enabled: boolean;
+}) => {
+  return useInfiniteQuery({
+    queryKey: ['reviews', memberId],
+    queryFn: ({ pageParam = 0 }) =>
+      getReviews({ memberId, page: pageParam, size: 3 }),
+    getNextPageParam: lastPage => {
+      return lastPage.page < lastPage.totalPages - 1
+        ? lastPage.page + 1
+        : undefined;
+    },
+    initialPageParam: 0,
+    enabled,
+    select: data => ({
+      pages: data.pages.flatMap(page => page.content),
+      pageParams: data.pageParams,
+    }),
   });
 };
 

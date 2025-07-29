@@ -9,11 +9,10 @@ export default function BiddingHistoryTab() {
     size: 10,
   });
 
-  console.log(biddingHistory);
   return (
     <div>
       <div className='flex flex-col gap-2 w-full border-b border-foreground/50 pb-2'>
-        <h1 className='text-2xl font-bold'>실시간입찰 내역</h1>
+        <h1 className='text-2xl font-bold'>실시간 입찰 내역</h1>
         <span className='text-sm text-gray-500'>
           총 {biddingHistory?.totalElements}회 입찰
         </span>

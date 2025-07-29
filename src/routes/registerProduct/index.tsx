@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Camera, Upload, Calendar, Clock, LucideX } from 'lucide-react';
 import { createFileRoute } from '@tanstack/react-router';
+import { useState } from 'react';
 import {
   Select,
   SelectItem,
@@ -24,6 +25,8 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import type { Address } from 'react-daum-postcode';
+import AddressSearchModal from '@/components/address-search-modal';
 
 export const Route = createFileRoute('/registerProduct/')({
   component: RegisterProductPage,
@@ -44,7 +47,30 @@ export default function RegisterProductPage() {
 
     form,
     handleFormSubmit,
+    isUploading,
   } = useImageUpload();
+
+  const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
+
+  const handleAddressComplete = (data: Address) => {
+    let fullAddress = data.address;
+    let extraAddress = '';
+
+    if (data.addressType === 'R') {
+      if (data.bname !== '') {
+        extraAddress += data.bname;
+      }
+      if (data.buildingName !== '') {
+        extraAddress +=
+          extraAddress !== '' ? `, ${data.buildingName}` : data.buildingName;
+      }
+      fullAddress += extraAddress !== '' ? ` (${extraAddress})` : '';
+    }
+    form.setValue('zipCode', data.zonecode);
+    form.setValue('address', fullAddress);
+    form.setFocus('addressDetail');
+    setIsAddressModalOpen(false);
+  };
 
   return (
     <div className='relative'>
@@ -97,34 +123,31 @@ export default function RegisterProductPage() {
                       />
                     </div>
                   )}
-                  {productImagesUrl?.length > 0 ? (
-                    <div className='flex gap-4'>
-                      {productImagesUrl?.map((url, index) => (
-                        <div key={index} className='relative'>
-                          <img
-                            src={url}
-                            alt={`product-image-${index}`}
-                            className='w-32 h-32 object-cover rounded-lg'
-                          />
-                          <Button
-                            type='button'
-                            variant='secondary'
-                            className='absolute top-2 right-2 rounded-full bg-black/50 hover:bg-black/70 w-4 h-6 p-2'
-                            onClick={() => handleProductImagesRemove(index)}
-                          >
-                            <LucideX className='w-2 h-2' />
-                          </Button>
-                        </div>
-                      ))}
+                  {productImagesUrl.map((url, index) => (
+                    <div key={index} className='relative'>
+                      <img
+                        src={url}
+                        alt={`product-image-${index}`}
+                        className='w-32 h-32 object-cover rounded-lg'
+                      />
+                      <Button
+                        type='button'
+                        variant='secondary'
+                        className='absolute top-2 right-2 rounded-full bg-black/50 hover:bg-black/70 w-4 h-6 p-2'
+                        onClick={() => handleProductImagesRemove(index)}
+                      >
+                        <LucideX className='w-2 h-2' />
+                      </Button>
                     </div>
-                  ) : (
+                  ))}
+                  {productImagesUrl.length < 4 && (
                     <div
                       className='w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center bg-white cursor-pointer hover:bg-gray-50'
                       onClick={handleProductImagesUpload}
                     >
                       <Camera className='w-8 h-8 text-gray-400 mb-2' />
                       <span className='text-xs text-gray-500 text-center'>
-                        상품 이미지 추가
+                        상품 이미지 추가 ({productImagesUrl.length}/4)
                       </span>
                       <input
                         type='file'
@@ -236,7 +259,7 @@ export default function RegisterProductPage() {
                         <FormItem className='flex-1'>
                           <FormLabel>우편번호</FormLabel>
                           <FormControl>
-                            <Input placeholder='12345' {...field} />
+                            <Input placeholder='12345' {...field} readOnly />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -246,6 +269,7 @@ export default function RegisterProductPage() {
                       type='button'
                       variant='outline'
                       className='mt-7 px-4 py-2 bg-gray-600 text-white hover:bg-gray-700'
+                      onClick={() => setIsAddressModalOpen(true)}
                     >
                       주소 검색
                     </Button>
@@ -258,7 +282,11 @@ export default function RegisterProductPage() {
                       <FormItem>
                         <FormLabel>주소</FormLabel>
                         <FormControl>
-                          <Input placeholder='주소를 입력해주세요' {...field} />
+                          <Input
+                            placeholder='주소를 입력해주세요'
+                            {...field}
+                            readOnly
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -435,14 +463,20 @@ export default function RegisterProductPage() {
                 <Button
                   type='submit'
                   className='w-full bg-black text-white hover:bg-gray-800 py-3 text-lg font-medium'
+                  disabled={isUploading}
                 >
-                  경매 시작
+                  {isUploading ? '이미지 업로드 중...' : '경매 시작'}
                 </Button>
               </CardContent>
             </Card>
           </div>
         </form>
       </Form>
+      <AddressSearchModal
+        isOpen={isAddressModalOpen}
+        onClose={() => setIsAddressModalOpen(false)}
+        onComplete={handleAddressComplete}
+      />
     </div>
   );
 }

@@ -1,4 +1,3 @@
-import { useGetSalesList } from '@/api/sale';
 import { Button } from '@/components/ui/button';
 import {
   Pagination,
@@ -13,13 +12,12 @@ import MySalesHistoryCard, {
 } from '@/routes/mypage/_components/mySales/MySalesHistoryCard';
 import { usePagination } from '@/hooks/usePagination';
 import { LucideBadgeDollarSign } from 'lucide-react';
-import { useEffect } from 'react';
+import { useGetMyAuctionList } from '@/api/my';
 
 export default function MySalesTab() {
   const {
     currentPage,
     totalPages,
-    setTotalPages,
     goToPage,
     nextPage,
     prevPage,
@@ -27,20 +25,10 @@ export default function MySalesTab() {
     canGoPrev,
   } = usePagination();
 
-  const { data: mySales, isLoading } = useGetSalesList(1, {
+  const { data: mySales } = useGetMyAuctionList({
     page: currentPage,
     size: 5,
   });
-
-  useEffect(() => {
-    if (mySales?.totalPages) {
-      setTotalPages(mySales.totalPages);
-    }
-  }, [mySales?.totalPages, setTotalPages]);
-
-  if (isLoading) {
-    return <div>로딩 중...</div>;
-  }
 
   return (
     <div className='flex flex-col gap-4'>

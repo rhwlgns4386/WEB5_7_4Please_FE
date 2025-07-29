@@ -6,6 +6,7 @@ import ProductImagePlaceholder from './ProductImagePlaceholder';
 import type { AuctionItem } from '@/types';
 import { useCountdown } from '@/hooks/useCountdown';
 import { useNavigate } from '@tanstack/react-router';
+import { useDeleteWishList } from '@/api/wishlist';
 
 interface ProductCardProps {
   product: AuctionItem;
@@ -58,6 +59,8 @@ export default function ProductCard({
     setImageLoading(false);
   };
 
+  const { mutate: deleteWishList } = useDeleteWishList();
+
   return (
     <Card
       onClick={() => navigate({ to: `/products/${product.auctionId}` })}
@@ -106,7 +109,9 @@ export default function ProductCard({
           }`}
           onClick={e => {
             e.stopPropagation();
-            onHeartClick?.(product.auctionId);
+            product.isWishlist
+              ? deleteWishList({ auctionId: product.auctionId })
+              : onHeartClick?.(product.auctionId);
           }}
         >
           <Heart
@@ -145,15 +150,17 @@ export default function ProductCard({
               isDark ? 'text-orange-400' : 'text-orange-500'
             }`}
           >
-            {product.instantPrice ? (
+            {product?.instantPrice ? (
               <span className='text-sm'>
                 <span className='text-gray-500 mr-2 text-xs'>즉시구매가</span>
                 <span className='text-lg font-bold'>
-                  {product.instantPrice.toLocaleString()}
+                  {product?.instantPrice
+                    ? product?.instantPrice?.toLocaleString()
+                    : ''}
                 </span>
               </span>
             ) : (
-              product.maxPrice.toLocaleString()
+              product?.maxPrice?.toLocaleString()
             )}
           </span>
           <span

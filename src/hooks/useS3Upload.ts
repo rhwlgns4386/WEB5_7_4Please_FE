@@ -2,7 +2,7 @@ import { s3Upload } from '@/api/auction';
 import { useMutation } from '@tanstack/react-query';
 
 export default function useS3Upload() {
-  const { mutate: uploadFileMutation } = useMutation({
+  const s3UploadMutation = useMutation({
     mutationFn: s3Upload,
     onSuccess: data => {
       console.log(data);
@@ -12,5 +12,5 @@ export default function useS3Upload() {
     },
   });
 
-  return { uploadFileMutation };
+  return s3UploadMutation;
 }

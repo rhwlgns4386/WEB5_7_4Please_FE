@@ -34,7 +34,7 @@ export const createOrder = ({
   type,
 }: {
   auctionId: number;
-  type: 'buyNow' | 'bid';
+  type: string;
   data: {
     price: number;
   };

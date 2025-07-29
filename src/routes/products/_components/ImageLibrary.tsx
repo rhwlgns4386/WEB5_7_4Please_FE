@@ -1,22 +1,31 @@
-export default function ImageLibrary() {
+import { useState } from 'react';
+
+interface Props {
+  images: string[];
+}
+
+export default function ImageLibrary({ images }: Props) {
+  const [selectedImage, setSelectedImage] = useState(images[0]);
+
   return (
     <div className='flex flex-col flex-1 p-5 border border-gray-500 rounded-lg'>
       <div className='min-w-[700px] flex flex-col'>
         <div className='w-full max-h-[600px]'>
           <img
-            src='https://picsum.photos/700/400'
+            src={selectedImage}
             className='w-full h-full object-cover'
             draggable={false}
           />
         </div>
         <div className='flex gap-3 py-6 px-4 '>
-          {Array.from({ length: 5 }).map((_, index) => (
+          {images.map((image, index) => (
             <div
-              className='w-[100px] h-[100px] rounded-md overflow-hidden cursor-pointer'
+              className={`w-[100px] h-[100px] rounded-md overflow-hidden cursor-pointer ${selectedImage === image ? 'ring-2 ring-orange-500' : ''}`}
               key={index}
+              onClick={() => setSelectedImage(image)}
             >
               <img
-                src='https://picsum.photos/700/400'
+                src={image}
                 className='w-full h-full object-cover'
                 draggable={false}
               />
