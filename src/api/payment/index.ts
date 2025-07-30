@@ -22,3 +22,17 @@ export const useCreatePayment = () => {
     },
   });
 };
+
+export const confirmPayment = (data: Payment) => {
+  return requests({
+    url: '/api/v1/payments/confirm',
+    method: 'POST',
+    data,
+  });
+};
+
+export const useConfirmPayment = () => {
+  return useMutation({
+    mutationFn: confirmPayment,
+  });
+};

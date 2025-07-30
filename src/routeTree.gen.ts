@@ -18,6 +18,8 @@ import { Route as MypageIndexRouteImport } from './routes/mypage/index'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as indexIndexRouteImport } from './routes/(index)/index'
 import { Route as ProductsIdRouteImport } from './routes/products/$id'
+import { Route as PaymentSuccessIndexRouteImport } from './routes/payment/success/index'
+import { Route as PaymentFailIndexRouteImport } from './routes/payment/fail/index'
 import { Route as AuthNaverIndexRouteImport } from './routes/auth/naver/index'
 import { Route as AuthGoogleIndexRouteImport } from './routes/auth/google/index'
 
@@ -66,6 +68,16 @@ const ProductsIdRoute = ProductsIdRouteImport.update({
   path: '/products/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PaymentSuccessIndexRoute = PaymentSuccessIndexRouteImport.update({
+  id: '/payment/success/',
+  path: '/payment/success/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PaymentFailIndexRoute = PaymentFailIndexRouteImport.update({
+  id: '/payment/fail/',
+  path: '/payment/fail/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthNaverIndexRoute = AuthNaverIndexRouteImport.update({
   id: '/auth/naver/',
   path: '/auth/naver/',
@@ -89,6 +101,8 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupIndexRoute
   '/auth/google': typeof AuthGoogleIndexRoute
   '/auth/naver': typeof AuthNaverIndexRoute
+  '/payment/fail': typeof PaymentFailIndexRoute
+  '/payment/success': typeof PaymentSuccessIndexRoute
 }
 export interface FileRoutesByTo {
   '/products/$id': typeof ProductsIdRoute
@@ -101,6 +115,8 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupIndexRoute
   '/auth/google': typeof AuthGoogleIndexRoute
   '/auth/naver': typeof AuthNaverIndexRoute
+  '/payment/fail': typeof PaymentFailIndexRoute
+  '/payment/success': typeof PaymentSuccessIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -115,6 +131,8 @@ export interface FileRoutesById {
   '/signup/': typeof SignupIndexRoute
   '/auth/google/': typeof AuthGoogleIndexRoute
   '/auth/naver/': typeof AuthNaverIndexRoute
+  '/payment/fail/': typeof PaymentFailIndexRoute
+  '/payment/success/': typeof PaymentSuccessIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -130,6 +148,8 @@ export interface FileRouteTypes {
     | '/signup'
     | '/auth/google'
     | '/auth/naver'
+    | '/payment/fail'
+    | '/payment/success'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/products/$id'
@@ -142,6 +162,8 @@ export interface FileRouteTypes {
     | '/signup'
     | '/auth/google'
     | '/auth/naver'
+    | '/payment/fail'
+    | '/payment/success'
   id:
     | '__root__'
     | '/login'
@@ -155,6 +177,8 @@ export interface FileRouteTypes {
     | '/signup/'
     | '/auth/google/'
     | '/auth/naver/'
+    | '/payment/fail/'
+    | '/payment/success/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -168,6 +192,8 @@ export interface RootRouteChildren {
   SignupIndexRoute: typeof SignupIndexRoute
   AuthGoogleIndexRoute: typeof AuthGoogleIndexRoute
   AuthNaverIndexRoute: typeof AuthNaverIndexRoute
+  PaymentFailIndexRoute: typeof PaymentFailIndexRoute
+  PaymentSuccessIndexRoute: typeof PaymentSuccessIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -235,6 +261,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/payment/success/': {
+      id: '/payment/success/'
+      path: '/payment/success'
+      fullPath: '/payment/success'
+      preLoaderRoute: typeof PaymentSuccessIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payment/fail/': {
+      id: '/payment/fail/'
+      path: '/payment/fail'
+      fullPath: '/payment/fail'
+      preLoaderRoute: typeof PaymentFailIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth/naver/': {
       id: '/auth/naver/'
       path: '/auth/naver'
@@ -273,6 +313,8 @@ const rootRouteChildren: RootRouteChildren = {
   SignupIndexRoute: SignupIndexRoute,
   AuthGoogleIndexRoute: AuthGoogleIndexRoute,
   AuthNaverIndexRoute: AuthNaverIndexRoute,
+  PaymentFailIndexRoute: PaymentFailIndexRoute,
+  PaymentSuccessIndexRoute: PaymentSuccessIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

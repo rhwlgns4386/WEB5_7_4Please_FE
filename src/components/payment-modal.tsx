@@ -30,15 +30,36 @@ import { useForm } from 'react-hook-form';
 import { useState } from 'react';
 import DaumPostcode from 'react-daum-postcode';
 import type { MyBid } from '@/types';
+import { loadTossPayments } from '@tosspayments/payment-sdk';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 
 interface Props {
   bidInfo: MyBid;
 }
 
+const formSchema = z.object({
+  name: z.string().min(2, '이름은 2자 이상 입력해주세요.'),
+  phone: z
+    .string()
+    .regex(/^010-\d{4}-\d{4}$/, '010-0000-0000 형식으로 입력해주세요.'),
+  postalCode: z.string().min(5, '우편번호를 입력해주세요.'),
+  address: z.string().min(1, '주소를 입력해주세요.'),
+  addressDetail: z.string().min(1, '상세주소를 입력해주세요.'),
+  request: z.string().optional(),
+  isBidAgree: z
+    .boolean()
+    .refine(val => val === true, '경매 이용약관에 동의해주세요.'),
+  isPersonalInfoAgree: z
+    .boolean()
+    .refine(val => val === true, '개인정보 수집 및 이용에 동의해주세요.'),
+});
+
 export default function PaymentModal({ bidInfo }: Props) {
   const [isAddressSearchOpen, setIsAddressSearchOpen] = useState(false);
 
-  const form = useForm({
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
       phone: '',
@@ -51,14 +72,26 @@ export default function PaymentModal({ bidInfo }: Props) {
     },
   });
 
-  const handleFormSubmit = (data: any) => {
-    console.log(data);
+  const handleFormSubmit = async (data: z.infer<typeof formSchema>) => {
+    const tossPayments = await loadTossPayments(
+      import.meta.env.VITE_TOSS_CLIENT_KEY
+    );
+
+    tossPayments.requestPayment('카드', {
+      amount: bidInfo.myBidPrice,
+      orderId: `${bidInfo.auctionId}-${new Date().getTime()}`,
+      orderName: bidInfo.product,
+      customerName: data.name,
+      successUrl: `${window.location.origin}/payment/success`,
+      failUrl: `${window.location.origin}/payment/fail`,
+    });
   };
 
   const handleAddressComplete = (data: any) => {
     // 우편번호와 주소를 폼에 설정
     form.setValue('postalCode', data.zonecode);
     form.setValue('address', data.address);
+    form.setFocus('addressDetail');
 
     // 주소 검색 팝업 닫기
     setIsAddressSearchOpen(false);
@@ -106,7 +139,7 @@ export default function PaymentModal({ bidInfo }: Props) {
                     </div>
                     <div>
                       <span className='text-2xl font-bold text-blue-400'>
-                        850,000원
+                        {bidInfo.myBidPrice.toLocaleString()}원
                       </span>
                     </div>
                   </div>
@@ -229,13 +262,13 @@ export default function PaymentModal({ bidInfo }: Props) {
                   <span className='text-lg font-bold'>결제 요약</span>
                   <div className='flex items-center w-full justify-between'>
                     <span>낙찰가</span>
-                    <span>850,000원</span>
+                    <span>{bidInfo.myBidPrice.toLocaleString()}원</span>
                   </div>
                   <Separator className='my-2 bg-gray-400' />
                   <div className='flex items-center w-full justify-between'>
                     <span>총 결제금액</span>
                     <span className='text-lg font-bold text-blue-400'>
-                      850,000원
+                      {bidInfo.myBidPrice.toLocaleString()}원
                     </span>
                   </div>
                   <div className='flex flex-col gap-3 mt-2'>
@@ -277,8 +310,9 @@ export default function PaymentModal({ bidInfo }: Props) {
                   <Button
                     className='w-full text-lg font-semibold text-white mt-6'
                     size={'lg'}
+                    type='submit'
                   >
-                    850,000원 결제하기
+                    {bidInfo.myBidPrice.toLocaleString()}원 결제하기
                   </Button>
                   <Card className='bg-blue-500/40 rounded-none mt-6 shadow-none'>
                     <CardTitle className='flex items-center gap-2 px-5'>
