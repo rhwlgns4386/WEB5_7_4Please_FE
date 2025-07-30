@@ -165,6 +165,7 @@ export default function BiddingHistoryCard({ bid }: Props) {
           </div>
         </div>
       </div>
+      <PaymentModal bidInfo={bid} />
       {bottomContentByStatusMapping[bid.status]()}
     </div>
   );

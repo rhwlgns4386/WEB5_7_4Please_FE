@@ -4,7 +4,6 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import type { AxiosResponse } from 'axios';
 import { toast } from 'sonner';
-import { useUserStore } from '@/store/user';
 
 export const signup = ({
   token,
@@ -79,14 +78,10 @@ export const useGetNickname = () => {
 
 export const useSignup = () => {
   const navigate = useNavigate();
-  const { setAccessToken } = useUserStore();
   return useMutation({
     mutationFn: signup,
     onSuccess: data => {
       toast.success('회원가입이 완료되었습니다.');
-      if (data.data.accessToken) {
-        setAccessToken(data.data.accessToken);
-      }
       navigate({ to: data.data.redirectUrl });
     },
     onError: () => {
