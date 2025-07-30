@@ -15,8 +15,8 @@ type BidMessageStatus =
   (typeof BidMessageStatus)[keyof typeof BidMessageStatus];
 
 interface BidMessage {
-  status: BidMessageStatus;
-  payload: Bid;
+  bidMessageStatus: BidMessageStatus;
+  bidResponse: Bid;
 }
 
 export default function BiddingHistoryTab() {
@@ -57,29 +57,34 @@ export default function BiddingHistoryTab() {
           const message: BidMessage = JSON.parse(event.data);
 
           // 3. 메시지 상태에 따라 분기 처리합니다.
-          switch (message.status) {
+          switch (message.bidMessageStatus) {
             case BidMessageStatus.BID_CREATED:
-              setBids(prevBids => [message.payload, ...prevBids]);
+              setBids(prevBids => [message.bidResponse, ...prevBids]);
               setTotalBids(prevTotal => prevTotal + 1);
               break;
 
             case BidMessageStatus.BID_UPDATED:
               setBids(prevBids =>
                 prevBids.map(bid =>
-                  bid.bidId === message.payload.bidId ? message.payload : bid
+                  bid.bidId === message.bidResponse.bidId
+                    ? message.bidResponse
+                    : bid
                 )
               );
               break;
 
             case BidMessageStatus.BID_DELETED:
               setBids(prevBids =>
-                prevBids.filter(bid => bid.bidId !== message.payload.bidId)
+                prevBids.filter(bid => bid.bidId !== message.bidResponse.bidId)
               );
               setTotalBids(prevTotal => prevTotal - 1);
               break;
 
             default:
-              console.warn('처리되지 않은 메시지 상태:', message.status);
+              console.warn(
+                '처리되지 않은 메시지 상태:',
+                message.bidMessageStatus
+              );
           }
         } catch (error) {
           console.error('***** 웹소켓 메시지 처리 에러 *****', error);
