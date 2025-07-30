@@ -36,6 +36,8 @@ import { z } from 'zod';
 
 interface Props {
   bidInfo: MyBid;
+  isOpen: boolean;
+  onClose: () => void;
 }
 
 const formSchema = z.object({
@@ -55,7 +57,7 @@ const formSchema = z.object({
     .refine(val => val === true, '개인정보 수집 및 이용에 동의해주세요.'),
 });
 
-export default function PaymentModal({ bidInfo }: Props) {
+export default function PaymentModal({ bidInfo, isOpen, onClose }: Props) {
   const [isAddressSearchOpen, setIsAddressSearchOpen] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -73,8 +75,10 @@ export default function PaymentModal({ bidInfo }: Props) {
   });
 
   const handleFormSubmit = async (data: z.infer<typeof formSchema>) => {
+    onClose(); // 토스 결제창 열기 전에 현재 모달을 닫습니다.
+
     const tossPayments = await loadTossPayments(
-      import.meta.env.VITE_TOSS_CLIENT_KEY
+      import.meta.env.VITE_TOSS_TEST_CLIENT_KEY
     );
 
     tossPayments.requestPayment('카드', {
@@ -98,13 +102,7 @@ export default function PaymentModal({ bidInfo }: Props) {
   };
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button variant={'outline'}>
-          <LucideIdCard />
-          결제하기
-        </Button>
-      </DialogTrigger>
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className='min-w-[1000px]'>
         <DialogHeader>
           <DialogTitle>경매결제</DialogTitle>

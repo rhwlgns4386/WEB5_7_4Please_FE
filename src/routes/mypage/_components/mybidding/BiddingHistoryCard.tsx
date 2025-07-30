@@ -4,7 +4,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { SellerReviewModal } from '@/routes/mypage/_components/SellerReviewModal';
 import type { MyBid } from '@/types';
-import { LucideAlertCircle, LucideTruck } from 'lucide-react';
+import { LucideAlertCircle, LucideIdCard, LucideTruck } from 'lucide-react';
+import { useState } from 'react';
 
 interface Props {
   bid: MyBid;
@@ -12,6 +13,7 @@ interface Props {
 
 export default function BiddingHistoryCard({ bid }: Props) {
   const { mutate: updateShipment } = useUpdateShipment();
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
 
   const bottomContentByStatusMapping = {
     OPEN: () => <></>,
@@ -39,7 +41,10 @@ export default function BiddingHistoryCard({ bid }: Props) {
     ),
     PENDING: () => (
       <div className='flex gap-2 w-full items-center justify-end mt-4'>
-        <PaymentModal bidInfo={bid} />
+        <Button variant={'outline'} onClick={() => setIsPaymentModalOpen(true)}>
+          <LucideIdCard />
+          결제하기
+        </Button>
         <Button variant={'outline'}>낙찰 포기</Button>
       </div>
     ),
@@ -165,7 +170,20 @@ export default function BiddingHistoryCard({ bid }: Props) {
           </div>
         </div>
       </div>
-      <PaymentModal bidInfo={bid} />
+      <div className='flex justify-end mt-2'>
+        <Button
+          variant={'secondary'}
+          size={'sm'}
+          onClick={() => setIsPaymentModalOpen(true)}
+        >
+          결제 테스트
+        </Button>
+      </div>
+      <PaymentModal
+        bidInfo={bid}
+        isOpen={isPaymentModalOpen}
+        onClose={() => setIsPaymentModalOpen(false)}
+      />
       {bottomContentByStatusMapping[bid.status]()}
     </div>
   );
