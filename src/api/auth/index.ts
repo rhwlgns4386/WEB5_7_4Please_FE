@@ -1,4 +1,5 @@
 import { requests } from '@/lib/axiosConfig';
+import { getMyMemberInfo } from '../my';
 import type { SigninType, SocialLoginResponse } from '@/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { AxiosError, AxiosResponse } from 'axios';
@@ -87,14 +88,24 @@ export const useDeleteMember = () => {
 
 export const useSocialLogin = () => {
   const navigate = useNavigate();
-  const { setAccessToken } = useUserStore();
+  const { setAccessToken, setNickname } = useUserStore();
   return useMutation({
     mutationFn: socialLogin,
-    onSuccess: data => {
+    onSuccess: async data => {
       const accessToken = data.headers.authorization?.split(' ')[1];
       if (accessToken) {
         setAccessToken(accessToken);
-        toast.success('로그인에 성공했습니다.');
+        try {
+          const memberInfoResponse = await getMyMemberInfo();
+          const nickname = memberInfoResponse.data.nickname;
+          if (nickname) {
+            setNickname(nickname);
+            toast.success(`${nickname}님, 환영합니다!`);
+          }
+        } catch (error) {
+          toast.error('사용자 정보를 가져오는데 실패했습니다.');
+        }
+
         navigate({
           to: '/',
         });

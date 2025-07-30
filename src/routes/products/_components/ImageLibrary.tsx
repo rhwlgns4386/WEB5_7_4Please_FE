@@ -1,11 +1,18 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface Props {
   images: string[];
+  thumbnail: string;
 }
 
-export default function ImageLibrary({ images }: Props) {
-  const [selectedImage, setSelectedImage] = useState(images[0]);
+export default function ImageLibrary({ images, thumbnail }: Props) {
+  const [selectedImage, setSelectedImage] = useState(thumbnail);
+
+  const newArray = [thumbnail, ...images];
+
+  useEffect(() => {
+    setSelectedImage(thumbnail);
+  }, [thumbnail]);
 
   return (
     <div className='flex flex-col flex-1 p-5 border border-gray-500 rounded-lg'>
@@ -18,7 +25,7 @@ export default function ImageLibrary({ images }: Props) {
           />
         </div>
         <div className='flex gap-3 py-6 px-4 '>
-          {images.map((image, index) => (
+          {newArray.map((image, index) => (
             <div
               className={`w-[100px] h-[100px] rounded-md overflow-hidden cursor-pointer ${selectedImage === image ? 'ring-2 ring-orange-500' : ''}`}
               key={index}

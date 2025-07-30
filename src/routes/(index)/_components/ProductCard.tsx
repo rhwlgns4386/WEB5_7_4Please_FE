@@ -129,7 +129,7 @@ export default function ProductCard({
         </button>
       </div>
       <CardContent className='p-4 space-y-2'>
-        <div className='mb-1'>
+        <div className='mb-3'>
           <Badge
             variant='outline'
             className={`text-xs font-medium ${getCategoryBadgeColor(product.category.name, isDark)}`}

@@ -80,10 +80,10 @@ export default function useImageUpload() {
         }),
 
       // 경매 설정
-      startDate: z.string().min(1, { message: '경매 시작일을 선택해주세요.' }),
-      startTime: z
-        .string()
-        .min(1, { message: '경매 시작 시간을 선택해주세요.' }),
+      // startDate: z.string().min(1, { message: '경매 시작일을 선택해주세요.' }),
+      // startTime: z
+      //   .string()
+      //   .min(1, { message: '경매 시작 시간을 선택해주세요.' }),
       bidPeriod: z.enum(['THREE', 'FIVE'], {
         message: '경매 기간을 선택해주세요.',
       }),
@@ -110,8 +110,8 @@ export default function useImageUpload() {
       address: '',
       addressDetail: '',
       phone: '',
-      startDate: '',
-      startTime: '',
+      // startDate: '',
+      // startTime: '',
       bidPeriod: 'THREE',
       startingPrice: 1000,
       buyNowPrice: 10000,
@@ -233,7 +233,7 @@ export default function useImageUpload() {
         addressDetail: data.addressDetail,
         zipCode: data.zipCode,
         phone: data.phone,
-        startDate: `${data.startDate}T${data.startTime}`,
+        // startDate: `${data.startDate}T${data.startTime}`,
         bidPeriod: data.bidPeriod,
         startingPrice: data.startingPrice,
         buyNowPrice: data.buyNowPrice,

@@ -31,6 +31,7 @@
     "@tanstack/react-query": "^5.81.5",
     "@tanstack/react-router": "^1.124.2",
     "@tanstack/react-router-devtools": "^1.124.2",
+    "@tosspayments/tosspayments-sdk": "^2.3.5",
     "@tsparticles/engine": "^3.8.1",
     "@tsparticles/react": "^3.0.0",
     "@tsparticles/slim": "^3.8.1",

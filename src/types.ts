@@ -8,7 +8,7 @@ export interface CreateAuctionRequest {
   addressDetail: string;
   zipCode: string;
   phone: string;
-  startDate: string;
+  // startDate: string;
   bidPeriod: string;
   startingPrice: number;
   buyNowPrice: number;

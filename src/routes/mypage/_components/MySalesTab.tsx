@@ -1,4 +1,5 @@
-import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import CommonSelect from '@/components/common-select';
 import {
   Pagination,
   PaginationContent,
@@ -10,25 +11,30 @@ import {
 import MySalesHistoryCard, {
   type SalesStatus,
 } from '@/routes/mypage/_components/mySales/MySalesHistoryCard';
-import { usePagination } from '@/hooks/usePagination';
-import { LucideBadgeDollarSign } from 'lucide-react';
+import { LucideBadgeDollarSign, LucideInfo } from 'lucide-react';
 import { useGetMyAuctionList } from '@/api/my';
+import { useState } from 'react';
 
 export default function MySalesTab() {
-  const {
-    currentPage,
-    totalPages,
-    goToPage,
-    nextPage,
-    prevPage,
-    canGoNext,
-    canGoPrev,
-  } = usePagination();
+  const [page, setPage] = useState(0);
+  const [size, setSize] = useState(5);
+
+  const searchOptions = [
+    { value: '5', label: '5개씩 보기' },
+    { value: '10', label: '10개씩 보기' },
+    { value: '15', label: '15개씩 보기' },
+    { value: '20', label: '20개씩 보기' },
+  ];
 
   const { data: mySales } = useGetMyAuctionList({
-    page: currentPage,
-    size: 5,
+    page,
+    size,
   });
+
+  const handleSizeChange = (value: string) => {
+    setSize(Number(value));
+    setPage(0);
+  };
 
   return (
     <div className='flex flex-col gap-4'>
@@ -38,57 +44,91 @@ export default function MySalesTab() {
           <span className='text-2xl font-bold'>내 판매 내역</span>
         </div>
         <div className='flex items-center gap-2'>
-          <span className='text-sm text-gray-400'>
+          <CommonSelect
+            label='보기 조건'
+            options={searchOptions}
+            defaultValue={String(size)}
+            onValueChange={handleSizeChange}
+          />
+          <Badge variant={'secondary'}>
             총 {mySales?.totalElements ?? 0}건
-          </span>
+          </Badge>
         </div>
       </div>
-      <div className='flex flex-col gap-6'>
-        {mySales?.content?.map(sale => (
-          <MySalesHistoryCard
-            key={sale.auctionId}
-            status={sale.status as SalesStatus}
-            auctionId={sale.auctionId}
-            salesData={sale}
-          />
-        ))}
-      </div>
 
-      <Pagination>
-        <PaginationContent>
-          <PaginationItem>
-            <Button
-              variant={'ghost'}
-              onClick={prevPage}
-              disabled={!canGoPrev}
-              className='hover:bg-gray-700'
-            >
-              <PaginationPrevious />
-            </Button>
-          </PaginationItem>
-          {Array.from({ length: totalPages }, (_, i) => (
-            <PaginationItem key={i}>
-              <Button
-                variant={currentPage === i ? 'default' : 'ghost'}
-                onClick={() => goToPage(i)}
-                className='hover:bg-gray-700'
-              >
-                <PaginationLink>{i + 1}</PaginationLink>
-              </Button>
-            </PaginationItem>
-          ))}
-          <PaginationItem>
-            <Button
-              variant={'ghost'}
-              onClick={nextPage}
-              disabled={!canGoNext}
-              className='hover:bg-gray-700'
-            >
-              <PaginationNext />
-            </Button>
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
+      {mySales && mySales.content.length > 0 ? (
+        <>
+          <div className='flex flex-col gap-6'>
+            {mySales.content.map(sale => (
+              <MySalesHistoryCard
+                key={sale.auctionId}
+                status={sale.status as SalesStatus}
+                auctionId={sale.auctionId}
+                salesData={sale}
+              />
+            ))}
+          </div>
+
+          {mySales.totalPages > 1 && (
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    href='#'
+                    onClick={e => {
+                      e.preventDefault();
+                      setPage(prev => Math.max(0, prev - 1));
+                    }}
+                    className={
+                      page === 0 ? 'pointer-events-none opacity-50' : ''
+                    }
+                  />
+                </PaginationItem>
+                {[...Array(mySales.totalPages)].map((_, i) => (
+                  <PaginationItem key={i}>
+                    <PaginationLink
+                      href='#'
+                      isActive={page === i}
+                      onClick={e => {
+                        e.preventDefault();
+                        setPage(i);
+                      }}
+                    >
+                      {i + 1}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
+                <PaginationItem>
+                  <PaginationNext
+                    href='#'
+                    onClick={e => {
+                      e.preventDefault();
+                      setPage(prev =>
+                        Math.min(mySales.totalPages - 1, prev + 1)
+                      );
+                    }}
+                    className={
+                      page === mySales.totalPages - 1
+                        ? 'pointer-events-none opacity-50'
+                        : ''
+                    }
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          )}
+        </>
+      ) : (
+        <div className='flex flex-col items-center justify-center gap-4 h-64 rounded-lg bg-gray-800/50'>
+          <LucideInfo className='w-12 h-12 text-gray-500' />
+          <p className='text-lg font-semibold text-gray-400'>
+            판매 내역이 없습니다.
+          </p>
+          <p className='text-sm text-gray-500'>
+            상품을 등록하고 판매를 시작해보세요!
+          </p>
+        </div>
+      )}
     </div>
   );
 }

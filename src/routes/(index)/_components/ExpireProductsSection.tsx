@@ -27,11 +27,7 @@ export default function ExpireProductsSection() {
   const products = productsData?.content;
 
   const handleHeartClick = (auctionId: number) => {
-    if (localStorage.getItem('token')) {
-      createWishListMutation({ auctionId });
-    } else {
-      // deleteWishListMutation({ auctionId });
-    }
+    createWishListMutation({ auctionId });
   };
 
   const seeAllProducts = () => {

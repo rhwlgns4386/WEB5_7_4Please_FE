@@ -39,7 +39,7 @@ export default function BiddingHistoryCard({ bid }: Props) {
     ),
     PENDING: () => (
       <div className='flex gap-2 w-full items-center justify-end mt-4'>
-        <PaymentModal />
+        <PaymentModal bidInfo={bid} />
         <Button variant={'outline'}>낙찰 포기</Button>
       </div>
     ),

@@ -4,7 +4,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
-import { Camera, Upload, Calendar, Clock, LucideX } from 'lucide-react';
+import { Camera, Upload, Clock, LucideX } from 'lucide-react';
 import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
 import {
@@ -14,7 +14,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { DatePicker } from '@/routes/registerProduct/DatePicker';
 import { GridPattern } from '@/components/ui/grid-pattern';
 import useImageUpload from '@/routes/registerProduct/hooks/useImageUpload';
 import {
@@ -338,12 +337,12 @@ export default function RegisterProductPage() {
 
             <Card>
               <CardContent className='p-6'>
-                <div className='flex items-center gap-2 mb-4'>
+                {/* <div className='flex items-center gap-2 mb-4'>
                   <Calendar className='w-5 h-5' />
                   <h2 className='text-xl font-bold'>시작일</h2>
-                </div>
+                </div> */}
 
-                <div className='flex gap-2'>
+                {/* <div className='flex gap-2'>
                   <FormField
                     control={form.control}
                     name='startDate'
@@ -376,7 +375,7 @@ export default function RegisterProductPage() {
                       </FormItem>
                     )}
                   />
-                </div>
+                </div> */}
 
                 <div className='border-2 border-red-300 rounded-lg p-4 mb-6'>
                   <div className='flex items-center gap-2 mb-3'>

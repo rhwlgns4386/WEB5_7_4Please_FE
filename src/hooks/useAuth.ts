@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 export default function useAuth() {
   const navigate = useNavigate();
-  const { accessToken, user, clearUser } = useUserStore();
+  const { accessToken, nickname, clearUser } = useUserStore();
 
   const isLoggedIn = !!accessToken;
 
@@ -43,7 +43,7 @@ export default function useAuth() {
 
   return {
     isLoggedIn,
-    user,
+    nickname,
     logout,
     handleClickGoogleLogin,
     handleClickNaverLogin,

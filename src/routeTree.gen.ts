@@ -13,6 +13,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as SignupIndexRouteImport } from './routes/signup/index'
 import { Route as RegisterProductIndexRouteImport } from './routes/registerProduct/index'
 import { Route as ProductsIndexRouteImport } from './routes/products/index'
+import { Route as PaymentIndexRouteImport } from './routes/payment/index'
 import { Route as MypageIndexRouteImport } from './routes/mypage/index'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as indexIndexRouteImport } from './routes/(index)/index'
@@ -38,6 +39,11 @@ const RegisterProductIndexRoute = RegisterProductIndexRouteImport.update({
 const ProductsIndexRoute = ProductsIndexRouteImport.update({
   id: '/products/',
   path: '/products/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PaymentIndexRoute = PaymentIndexRouteImport.update({
+  id: '/payment/',
+  path: '/payment/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MypageIndexRoute = MypageIndexRouteImport.update({
@@ -77,6 +83,7 @@ export interface FileRoutesByFullPath {
   '/': typeof indexIndexRoute
   '/login/': typeof LoginIndexRoute
   '/mypage': typeof MypageIndexRoute
+  '/payment': typeof PaymentIndexRoute
   '/products': typeof ProductsIndexRoute
   '/registerProduct': typeof RegisterProductIndexRoute
   '/signup': typeof SignupIndexRoute
@@ -88,6 +95,7 @@ export interface FileRoutesByTo {
   '/': typeof indexIndexRoute
   '/login': typeof LoginIndexRoute
   '/mypage': typeof MypageIndexRoute
+  '/payment': typeof PaymentIndexRoute
   '/products': typeof ProductsIndexRoute
   '/registerProduct': typeof RegisterProductIndexRoute
   '/signup': typeof SignupIndexRoute
@@ -101,6 +109,7 @@ export interface FileRoutesById {
   '/(index)/': typeof indexIndexRoute
   '/login/': typeof LoginIndexRoute
   '/mypage/': typeof MypageIndexRoute
+  '/payment/': typeof PaymentIndexRoute
   '/products/': typeof ProductsIndexRoute
   '/registerProduct/': typeof RegisterProductIndexRoute
   '/signup/': typeof SignupIndexRoute
@@ -115,6 +124,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login/'
     | '/mypage'
+    | '/payment'
     | '/products'
     | '/registerProduct'
     | '/signup'
@@ -126,6 +136,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/mypage'
+    | '/payment'
     | '/products'
     | '/registerProduct'
     | '/signup'
@@ -138,6 +149,7 @@ export interface FileRouteTypes {
     | '/(index)/'
     | '/login/'
     | '/mypage/'
+    | '/payment/'
     | '/products/'
     | '/registerProduct/'
     | '/signup/'
@@ -150,6 +162,7 @@ export interface RootRouteChildren {
   ProductsIdRoute: typeof ProductsIdRoute
   indexIndexRoute: typeof indexIndexRoute
   MypageIndexRoute: typeof MypageIndexRoute
+  PaymentIndexRoute: typeof PaymentIndexRoute
   ProductsIndexRoute: typeof ProductsIndexRoute
   RegisterProductIndexRoute: typeof RegisterProductIndexRoute
   SignupIndexRoute: typeof SignupIndexRoute
@@ -185,6 +198,13 @@ declare module '@tanstack/react-router' {
       path: '/products'
       fullPath: '/products'
       preLoaderRoute: typeof ProductsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payment/': {
+      id: '/payment/'
+      path: '/payment'
+      fullPath: '/payment'
+      preLoaderRoute: typeof PaymentIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/mypage/': {
@@ -247,6 +267,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProductsIdRoute: ProductsIdRoute,
   indexIndexRoute: indexIndexRoute,
   MypageIndexRoute: MypageIndexRoute,
+  PaymentIndexRoute: PaymentIndexRoute,
   ProductsIndexRoute: ProductsIndexRoute,
   RegisterProductIndexRoute: RegisterProductIndexRoute,
   SignupIndexRoute: SignupIndexRoute,

@@ -39,7 +39,9 @@ export const updateNickname = ({ nickName }: { nickName: string }) => {
   return requests({
     url: `/api/v1/members`,
     method: 'PATCH',
-    data: nickName,
+    data: {
+      nickName,
+    },
   });
 };
 
@@ -104,6 +106,7 @@ export const useUpdateNickname = () => {
     mutationFn: updateNickname,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['member'] });
+      queryClient.invalidateQueries({ queryKey: ['member', 'myMemberInfo'] });
       toast.success('닉네임이 변경되었습니다.');
       navigate({ to: '/mypage' });
     },

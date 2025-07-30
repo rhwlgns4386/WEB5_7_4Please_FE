@@ -1,5 +1,6 @@
 import { requests } from '@/lib/axiosConfig';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
 export const createSettlement = ({ auctionId }: { auctionId: number }) => {
   return requests({
@@ -17,6 +18,7 @@ export const useCreateSettlement = () => {
     onSuccess: (_, { auctionId }) => {
       queryClient.invalidateQueries({ queryKey: ['settlements'] });
       queryClient.invalidateQueries({ queryKey: ['auctions', auctionId] });
+      toast.success('차상위 입찰 제안이 완료되었습니다.');
     },
   });
 };

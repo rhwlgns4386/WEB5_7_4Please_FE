@@ -29,8 +29,13 @@ import {
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
 import DaumPostcode from 'react-daum-postcode';
+import type { MyBid } from '@/types';
 
-export default function PaymentModal() {
+interface Props {
+  bidInfo: MyBid;
+}
+
+export default function PaymentModal({ bidInfo }: Props) {
   const [isAddressSearchOpen, setIsAddressSearchOpen] = useState(false);
 
   const form = useForm({
@@ -86,16 +91,16 @@ export default function PaymentModal() {
                   <div className='flex w-full justify-between items-end'>
                     <div className='flex gap-4 items-center'>
                       <img
-                        src='https://www.firstintuition.co.uk/wp-content/uploads/2021/05/mockexams-23-e1683712355172.png'
+                        src={bidInfo.thumbnailUrl}
                         alt='상품 이미지'
                         className='w-20 h-20 rounded-lg object-cover'
                       />
                       <div className='flex flex-col gap-4'>
                         <span className='text-lg font-bold'>
-                          아이폰14Pro 128GB딥퍼플
+                          {bidInfo.product}
                         </span>
                         <span className='text-sm text-gray-700 bg-gray-300 rounded-xl px-3 py-1'>
-                          판매자: vintage_collector
+                          판매자: {bidInfo.sellerNickName}
                         </span>
                       </div>
                     </div>
