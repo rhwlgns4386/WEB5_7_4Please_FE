@@ -100,6 +100,15 @@ export interface MyBid {
   paymentDeadline: string;
   sellerNickName: string;
 }
+
+export interface OrderInfo{
+  auctionId: number;
+  type: string;
+  amount: number;
+  productName:string;
+  sellerNickName:string;
+  thumbnailUrl: string;
+}
 export interface MyBidList {
   content: MyBid[];
   page: number;

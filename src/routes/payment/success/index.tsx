@@ -1,13 +1,13 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useConfirmPayment } from '@/api/payment';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
 const paymentSuccessSearchSchema = z.object({
   paymentKey: z.string(),
   orderId: z.string(),
-  amount: z.string(),
+  amount: z.number(),
 });
 
 export const Route = createFileRoute('/payment/success/')({
@@ -19,9 +19,12 @@ function PaymentSuccess() {
   const navigate = useNavigate();
   const { paymentKey, orderId, amount } = Route.useSearch();
   const { mutate: confirmPayment } = useConfirmPayment();
+  const hasExecuted = useRef(false);
 
   useEffect(() => {
-    if (paymentKey && orderId && amount) {
+    if (paymentKey && orderId && amount && !hasExecuted.current) {
+      hasExecuted.current = true;
+
       confirmPayment(
         { paymentKey, orderId, amount: Number(amount) },
         {

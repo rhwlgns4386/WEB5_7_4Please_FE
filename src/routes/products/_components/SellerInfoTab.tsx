@@ -91,6 +91,7 @@ export default function SellerInfoTab() {
         </div>
       </div>
       <SalesHistoryModal
+        sellerId={sellerInfo?.sellerId}
         isOpen={isSalesHistoryModalOpen}
         onClose={() => setIsSalesHistoryModalOpen(false)}
       />

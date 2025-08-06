@@ -9,13 +9,14 @@ import {
 } from '@/components/ui/dialog';
 
 interface Props {
+  sellerId: number;
   isOpen: boolean;
   onClose: () => void;
 }
 
-export default function SalesHistoryModal({ isOpen, onClose }: Props) {
+export default function SalesHistoryModal({sellerId ,isOpen, onClose }: Props) {
   const { data: salesList } = useGetSalesList({
-    sellerId: 1,
+    sellerId: sellerId,
     page: 0,
     size: 10,
   });

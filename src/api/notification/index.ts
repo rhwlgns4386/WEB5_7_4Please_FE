@@ -21,8 +21,8 @@ export const updateNotification = ({
   notificationId: number;
 }) => {
   return requests({
-    url: `/api/v1/notification/${notificationId}`,
-    method: 'PUT',
+    url: `/api/v1/notification/click/${notificationId}`,
+    method: 'PATCH',
   });
 };
 

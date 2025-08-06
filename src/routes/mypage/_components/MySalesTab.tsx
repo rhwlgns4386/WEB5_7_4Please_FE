@@ -50,7 +50,7 @@ export default function MySalesTab() {
             defaultValue={String(size)}
             onValueChange={handleSizeChange}
           />
-          <Badge variant={'secondary'}>
+          <Badge variant={'secondary'}>thumbnailUrl
             총 {mySales?.totalElements ?? 0}건
           </Badge>
         </div>

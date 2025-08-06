@@ -20,7 +20,8 @@ export type SalesStatus =
   | 'SUCCESS'
   | 'REJECTED'
   | 'INTRANSIT'
-  | 'DELIVERED';
+  | 'DELIVERED'
+  | 'CLOSE';
 
 interface Props {
   status: SalesStatus;
@@ -33,6 +34,10 @@ export default function MySalesHistoryCard({
   auctionId,
   salesData,
 }: Props) {
+  console.log("status : " + status)
+  console.log("auctionId : " + auctionId)
+  console.log("salesData : " +  JSON.stringify(salesData, null, 2))
+
   const { mutate: createSettlement } = useCreateSettlement();
   const timeLeft = usePaymentCountdown(salesData.endTime);
 
@@ -176,6 +181,7 @@ export default function MySalesHistoryCard({
     ),
     DELIVERED: () => <></>,
     INTRANSIT: () => <></>,
+    CLOSE: () => <></>,
   };
 
   const badgeByStatusMapping = {
@@ -210,21 +216,28 @@ export default function MySalesHistoryCard({
         유찰
       </Badge>
     ),
+    CLOSE:() =>{
+      <Badge variant={'destructive'} className='text-white'>
+        경매종료
+      </Badge>
+    }
   };
 
   return (
+
     <div className='bg-gray-800/50 rounded-lg px-4 py-3'>
       <div className='flex gap-4 items-center '>
         <div className='w-[100px] h-[100px] rounded-lg overflow-hidden shrink-0'>
           <img
-            src={'https://picsum.photos/200/300'}
-            alt='bidding-history-image'
+            src={salesData.thumbnailUrl}
+            alt='favorite-image'
+            className='w-full h-full object-cover scale-105 hover:scale-110 transition-transform duration-200'
           />
         </div>
         <div className='w-full flex flex-col gap-2 '>
           <div className='flex justify-between items-center w-full'>
             <div className='flex gap-2 items-center'>
-              <span className='text-lg font-bold'>아이폰 16 프로 맥스</span>
+              <span className='text-lg font-bold'>{salesData.name}</span>
               <Badge variant={'secondary'}>물품카테고리</Badge>
             </div>
             {badgeByStatusMapping[status]()}
@@ -233,7 +246,7 @@ export default function MySalesHistoryCard({
             <div className='flex gap-2 flex-col rounded-lg p-2 min-w-[250px] flex-1'>
               <span className='text-sm text-gray-500'>시작가</span>
               <span className='text-lg font-bold text-green-500/80'>
-                100,000원
+                {salesData.instantPrice.toLocaleString()}원
               </span>
             </div>
             <div
@@ -241,14 +254,14 @@ export default function MySalesHistoryCard({
             >
               <span className='text-sm text-white'>현재가/낙찰가</span>
               <span className='text-lg font-bold text-blue-500/80'>
-                100,000원
+                {salesData.maxPrice?.toLocaleString()}원
               </span>
             </div>
             <div
               className={`flex gap-2 flex-col rounded-lg p-2 min-w-[250px] flex-1`}
             >
               <span className='text-sm text-white'>입찰수</span>
-              <span className='text-lg font-bold'>12회</span>
+              <span className='text-lg font-bold'>{salesData.bidCount}회</span>
             </div>
           </div>
         </div>

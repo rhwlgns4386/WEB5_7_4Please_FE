@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useCountdown } from '@/hooks/useCountdown';
 import BiddingPriceConfirmModal from '@/routes/products/_components/modals/BiddingPriceConfirmModal';
-import type { ProductDetail } from '@/types';
+import type { OrderInfo, ProductDetail } from '@/types';
 import { useParams } from '@tanstack/react-router';
 import {
   LucideActivity,
@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import PaymentModal from '@/components/payment-modal.tsx';
 
 type Status =
   | 'hasImmediatePaymentSeller'
@@ -38,6 +39,7 @@ interface ContentComponentProps {
   setBidPrice: (value: number) => void;
   setIsBiddingPriceConfirmModalOpen: (value: boolean) => void;
   setModalMode: (value: ModalMode) => void;
+  handleCreateInstantOrder: () => void;
   id: string;
 }
 
@@ -73,12 +75,12 @@ const contentsMapping = {
     );
   },
   default: ({
-    productDetail,
-    bidPrice,
-    setBidPrice,
-    setIsBiddingPriceConfirmModalOpen,
-    setModalMode,
-  }: ContentComponentProps) => {
+              productDetail,
+              bidPrice,
+              setBidPrice,
+              setIsBiddingPriceConfirmModalOpen,
+              setModalMode,
+            }: ContentComponentProps) => {
     return (
       <div className='flex flex-col gap-4'>
         <div className='flex flex-col gap-4 items-center justify-center rounded-lg bg-white p-5'>
@@ -124,9 +126,9 @@ const contentsMapping = {
     );
   },
   withoutImmediatePaymentSeller: ({
-    productDetail,
-    id,
-  }: ContentComponentProps) => {
+                                    productDetail,
+                                    id,
+                                  }: ContentComponentProps) => {
     return (
       <div className='flex flex-col gap-4'>
         <div className='flex flex-col gap-4 items-center justify-center rounded-lg bg-white p-5'>
@@ -149,12 +151,13 @@ const contentsMapping = {
     );
   },
   hasImmediatePaymentBuyer: ({
-    productDetail,
-    bidPrice,
-    setBidPrice,
-    setIsBiddingPriceConfirmModalOpen,
-    setModalMode,
-  }: ContentComponentProps) => {
+                               productDetail,
+                               bidPrice,
+                               setBidPrice,
+                               setIsBiddingPriceConfirmModalOpen,
+                               setModalMode,
+                               handleCreateInstantOrder,
+                             }: ContentComponentProps) => {
     return (
       <div className='flex flex-col gap-4'>
         <div className='flex flex-col gap-4 items-center justify-center rounded-lg bg-white p-5'>
@@ -207,10 +210,7 @@ const contentsMapping = {
             className='w-full bg-orange-500 hover:bg-orange-700 text-gray-50 font-bold'
             size={'lg'}
             variant={'default'}
-            onClick={() => {
-              setModalMode('buyNow');
-              setIsBiddingPriceConfirmModalOpen(true);
-            }}
+            onClick={handleCreateInstantOrder}
           >
             <LucideZap className='w-4 h-4' fill='white' />
             즉시 입찰가로 구매하기
@@ -255,6 +255,8 @@ export default function BiddingForm({ productDetail }: BiddingFormProps) {
   const timeLeft = useCountdown(productDetail.endTime);
   const { mutate: createBid } = useCreateBid();
   const { mutate: createOrder } = useCreateOrder();
+  const [orderInfo, setOrderInfo] = useState<OrderInfo | null>(null);
+  const [isOpenOrderModal, setIsOpenOrderModal] = useState(false);
 
   const handleCreateBid = () => {
     if (bidPrice <= productDetail.highestBidPrice) {
@@ -278,21 +280,17 @@ export default function BiddingForm({ productDetail }: BiddingFormProps) {
   };
 
   const handleCreateInstantOrder = () => {
-    createOrder(
-      {
-        auctionId: Number(id),
-        type: 'BUY_NOW',
-        data: {
-          price: productDetail.instantBidPrice,
-        },
-      },
-      {
-        onSuccess: () => {
-          setIsBiddingPriceConfirmModalOpen(false);
-          toast.success('즉시 구매가 완료되었습니다.');
-        },
-      }
-    );
+    const newOrderInfo: OrderInfo = {
+      productName: productDetail.productName,
+      amount: productDetail.instantBidPrice,
+      type: 'BUY_NOW',
+      auctionId: id,
+      thumbnailUrl: productDetail.thumbnailUrl,
+      sellerNickName:'test'
+    };
+
+    setOrderInfo(newOrderInfo);
+    setIsOpenOrderModal(true);
   };
 
   const Contents = contentsMapping[status];
@@ -319,13 +317,16 @@ export default function BiddingForm({ productDetail }: BiddingFormProps) {
           setBidPrice={setBidPrice}
           setIsBiddingPriceConfirmModalOpen={setIsBiddingPriceConfirmModalOpen}
           setModalMode={setModalMode}
+          handleCreateInstantOrder={handleCreateInstantOrder}
           id={id}
         />
       </div>
+
       <div className='flex items-center gap-2 text-sm text-gray-400 mt-5 border-t border-gray-500 pt-5'>
         <LucideAlertCircle className='w-4 h-4' />
         <span>신중하게 입찰해 주세요.</span>
       </div>
+
       <BiddingPriceConfirmModal
         isOpen={isBiddingPriceConfirmModalOpen}
         onClose={() => setIsBiddingPriceConfirmModalOpen(false)}
@@ -336,6 +337,17 @@ export default function BiddingForm({ productDetail }: BiddingFormProps) {
           modalMode === 'bid' ? bidPrice : productDetail.instantBidPrice
         }
       />
+
+      {orderInfo && (
+        <PaymentModal
+          orderInfo={orderInfo}
+          isOpen={isOpenOrderModal}
+          onClose={() => {
+            setIsOpenOrderModal(false);
+            setOrderInfo(null);
+          }}
+        />
+      )}
     </div>
   );
 }

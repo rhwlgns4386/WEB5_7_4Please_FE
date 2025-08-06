@@ -36,13 +36,13 @@ export default function NotificationListModal({
           {notifications && notifications.length > 0 ? (
             notifications.map(noti => (
               <div
-                key={noti.notificationId}
+                key={noti.id}
                 className={`p-3 rounded-md cursor-pointer transition-colors ${
                   noti.isRead
                     ? 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200'
                     : 'bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100'
                 }`}
-                onClick={() => onNotificationClick(noti.notificationId)}
+                onClick={() => onNotificationClick(noti.id)}
               >
                 <div className='flex items-center gap-2'>
                   {!noti.isRead && (
@@ -55,7 +55,7 @@ export default function NotificationListModal({
                         : 'text-gray-800 dark:text-gray-300'
                     }`}
                   >
-                    {noti.message}
+                    {noti.message.message}
                   </p>
                 </div>
               </div>

@@ -43,7 +43,22 @@ export default function Header() {
   const { mutate: updateNotification } = useUpdateNotification();
 
   const handleNotificationClick = (notificationId: number) => {
+    // 알림 목록을 평탄화
+    console.log(notificationId)
+    // 해당 알림 찾기
+    const notification = notifications?.find(n => Number(n.id) === notificationId);
+
+
+    if (!notification) {
+      console.warn("Notification not found");
+      return;
+    }
+
     updateNotification({ notificationId });
+
+    if(notification.message.url){
+      window.location.href = notification.message.url;
+    }
   };
 
   const isAllRead = notificationFive?.every(noti => noti.isRead) ?? true;

@@ -29,13 +29,15 @@ import {
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
 import DaumPostcode from 'react-daum-postcode';
-import type { MyBid } from '@/types';
+import type { MyBid, OrderInfo } from '@/types';
 import { loadTossPayments } from '@tosspayments/payment-sdk';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { toast } from 'sonner';
+import { useCreateOrder } from '@/api/order';
 
 interface Props {
-  bidInfo: MyBid;
+  orderInfo: OrderInfo
   isOpen: boolean;
   onClose: () => void;
 }
@@ -57,8 +59,9 @@ const formSchema = z.object({
     .refine(val => val === true, '개인정보 수집 및 이용에 동의해주세요.'),
 });
 
-export default function PaymentModal({ bidInfo, isOpen, onClose }: Props) {
+export default function PaymentModal({orderInfo,isOpen, onClose }: Props) {
   const [isAddressSearchOpen, setIsAddressSearchOpen] = useState(false);
+  const { mutateAsync: createOrder } = useCreateOrder();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -74,7 +77,29 @@ export default function PaymentModal({ bidInfo, isOpen, onClose }: Props) {
     },
   });
 
+  const handleCreateInstantOrder = async () => {
+    try {
+      const orderId = await createOrder({
+        auctionId: Number(orderInfo.auctionId),
+        type: orderInfo.type,
+        data: {
+          price: orderInfo.amount,
+        },
+      });
+      console.log(orderId);
+      return String(orderId.data.orderId);
+    } catch (error) {
+      console.error('주문 생성 실패:', error);
+      throw error;
+    }
+  };
+
+
   const handleFormSubmit = async (data: z.infer<typeof formSchema>) => {
+
+    const orderId = await handleCreateInstantOrder();
+    console.log("주문 : " + orderId)
+
     onClose(); // 토스 결제창 열기 전에 현재 모달을 닫습니다.
 
     const tossPayments = await loadTossPayments(
@@ -82,9 +107,10 @@ export default function PaymentModal({ bidInfo, isOpen, onClose }: Props) {
     );
 
     tossPayments.requestPayment('카드', {
-      amount: bidInfo.myBidPrice,
-      orderId: `${bidInfo.auctionId}-${new Date().getTime()}`,
-      orderName: bidInfo.product,
+      amount: orderInfo.amount,
+      // orderId: `${bidInfo.auctionId}-${new Date().getTime()}`,
+      orderId: orderId,
+      orderName: orderInfo.productName,
       customerName: data.name,
       successUrl: `${window.location.origin}/payment/success`,
       failUrl: `${window.location.origin}/payment/fail`,
@@ -122,22 +148,22 @@ export default function PaymentModal({ bidInfo, isOpen, onClose }: Props) {
                   <div className='flex w-full justify-between items-end'>
                     <div className='flex gap-4 items-center'>
                       <img
-                        src={bidInfo.thumbnailUrl}
+                        src={orderInfo.thumbnailUrl}
                         alt='상품 이미지'
                         className='w-20 h-20 rounded-lg object-cover'
                       />
                       <div className='flex flex-col gap-4'>
                         <span className='text-lg font-bold'>
-                          {bidInfo.product}
+                          {orderInfo.productName}
                         </span>
                         <span className='text-sm text-gray-700 bg-gray-300 rounded-xl px-3 py-1'>
-                          판매자: {bidInfo.sellerNickName}
+                          판매자: {orderInfo.sellerNickName}
                         </span>
                       </div>
                     </div>
                     <div>
                       <span className='text-2xl font-bold text-blue-400'>
-                        {bidInfo.myBidPrice.toLocaleString()}원
+                        {orderInfo.amount.toLocaleString()}원
                       </span>
                     </div>
                   </div>
@@ -260,13 +286,13 @@ export default function PaymentModal({ bidInfo, isOpen, onClose }: Props) {
                   <span className='text-lg font-bold'>결제 요약</span>
                   <div className='flex items-center w-full justify-between'>
                     <span>낙찰가</span>
-                    <span>{bidInfo.myBidPrice.toLocaleString()}원</span>
+                    <span>{orderInfo.amount.toLocaleString()}원</span>
                   </div>
                   <Separator className='my-2 bg-gray-400' />
                   <div className='flex items-center w-full justify-between'>
                     <span>총 결제금액</span>
                     <span className='text-lg font-bold text-blue-400'>
-                      {bidInfo.myBidPrice.toLocaleString()}원
+                      {orderInfo.amount.toLocaleString()}원
                     </span>
                   </div>
                   <div className='flex flex-col gap-3 mt-2'>
@@ -310,7 +336,7 @@ export default function PaymentModal({ bidInfo, isOpen, onClose }: Props) {
                     size={'lg'}
                     type='submit'
                   >
-                    {bidInfo.myBidPrice.toLocaleString()}원 결제하기
+                    {orderInfo.amount.toLocaleString()}원 결제하기
                   </Button>
                   <Card className='bg-blue-500/40 rounded-none mt-6 shadow-none'>
                     <CardTitle className='flex items-center gap-2 px-5'>

@@ -3,9 +3,11 @@ import PaymentModal from '@/components/payment-modal';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { SellerReviewModal } from '@/routes/mypage/_components/SellerReviewModal';
-import type { MyBid } from '@/types';
+import type { MyBid, OrderInfo } from '@/types';
 import { LucideAlertCircle, LucideIdCard, LucideTruck } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
+import { useCreateOrder } from '@/api/order';
 
 interface Props {
   bid: MyBid;
@@ -14,6 +16,20 @@ interface Props {
 export default function BiddingHistoryCard({ bid }: Props) {
   const { mutate: updateShipment } = useUpdateShipment();
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const { mutate: createOrder } = useCreateOrder();
+  const [orderInfo, setOrderInfo] = useState<OrderInfo>(null);
+
+  const handleCreateInstantOrder = () => {
+    setOrderInfo( {
+      productName: bid.product,
+      amount: bid.myBidPrice,
+      type: 'AWARD',
+      auctionId: bid.auctionId,
+      thumbnailUrl: bid.thumbnailUrl,
+      sellerNickName:'test'
+    })
+    setIsPaymentModalOpen(true)
+  };
 
   const bottomContentByStatusMapping = {
     OPEN: () => <></>,
@@ -41,8 +57,14 @@ export default function BiddingHistoryCard({ bid }: Props) {
     ),
     PENDING: () => (
       <div className='flex gap-2 w-full items-center justify-end mt-4'>
-        <Button variant={'outline'} onClick={() => setIsPaymentModalOpen(true)}>
-          <LucideIdCard />
+        <Button
+          variant={'secondary'}
+          size={'sm'}
+          onClick={() =>{
+            handleCreateInstantOrder()
+
+          } }
+        >
           결제하기
         </Button>
         <Button variant={'outline'}>낙찰 포기</Button>
@@ -170,20 +192,14 @@ export default function BiddingHistoryCard({ bid }: Props) {
           </div>
         </div>
       </div>
-      <div className='flex justify-end mt-2'>
-        <Button
-          variant={'secondary'}
-          size={'sm'}
-          onClick={() => setIsPaymentModalOpen(true)}
-        >
-          결제 테스트
-        </Button>
-      </div>
-      <PaymentModal
-        bidInfo={bid}
+      {orderInfo && (<PaymentModal
+        orderInfo={orderInfo}
         isOpen={isPaymentModalOpen}
-        onClose={() => setIsPaymentModalOpen(false)}
-      />
+        onClose={() => {
+          setIsPaymentModalOpen(false);
+          setOrderInfo(null);
+        }}
+      />)}
       {bottomContentByStatusMapping[bid.status]()}
     </div>
   );
